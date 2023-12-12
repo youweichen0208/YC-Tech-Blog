@@ -3,10 +3,11 @@ home: true
 layout: BlogHome
 icon: home
 title: Blog Home
+bgImage: "/assets/images/background.jpg"
 # heroImage: /pfp.jpg
 heroText: YC Tech Blog
-tagline: Embrace challenges as opportunities for growth, and let the resilience be the driving force towards success.
-heroFullScreen: false
+tagline: Welcome to my blog! Scroll down to see more :)
+heroFullScreen: true
 ---
 
 This is a blog home page demo.

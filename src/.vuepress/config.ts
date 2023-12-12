@@ -8,7 +8,7 @@ export default defineUserConfig({
   lang: "en-US",
   title: "YC Tech Blog",
   description: "A blog demo for vuepress-theme-hope",
-
+  head: [["link", { rel: "icon", href: "/favicon.ico" }]],
   theme,
   // plugins: [
   //   searchProPlugin({
