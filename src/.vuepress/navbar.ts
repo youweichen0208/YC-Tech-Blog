@@ -47,6 +47,8 @@ export default navbar([
     prefix: "/data-structure/",
     children: [
       { text: "Dynamic Programming", icon: "pen-to-square", link: "dp" },
+      { text: "Sliding Window", icon: "pen-to-square", link: "sliding-window" },
+      {text: "backtracking", icon: "pen-to-square", link: "backtracking"},
     ],
   },
   {
