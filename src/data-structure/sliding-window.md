@@ -11,6 +11,7 @@ tag:
 ---
 
 # Sliding Window
+
 ### 1. When should we use sliding window?
 
 1. the problem will either explicitly or implicitly define criteria that make a subarray "valid":
@@ -22,14 +23,32 @@ tag:
 
 ### 2. pseudocode for a general template:
 
-```pseudocode
-function fn(arr):
-    left = 0
-    for (int right = 0; right < arr.length; right++):
-        Do some logic to "add" element at arr[right] to window
+```java
+public int fn(int[] arr) {
+    int left = 0, ans = 0, curr = 0;
 
-        while WINDOW_IS_INVALID:
-            Do some logic to "remove" element at arr[left] from window
-            left++
-        Do some logic to update the answer
+    for (int right = 0; right < arr.length; right++) {
+        // do logic here to add arr[right] to curr
+
+        while (WINDOW_CONDITION_BROKEN) {
+            // remove arr[left] from curr
+            left++;
+        }
+
+        // update ans
+    }
+
+    return ans;
+}
 ```
+
+1. `Initialization:` We start by initializing two pointers, `left` and `right`, to the start of the array. We also initialize a variable `curr` to store the current state of the window, and `ans` to store the final answer.
+2. `Expand the Window:` we start expanding the window by moving `right` pointer towards the end of the array. As we add new elements into the window, we update the `curr` state accordingly.
+3. `Window Condition Check:` After each expansion, we check if the window condition is broken. This condition is problem-specific and can be anything like the sum of the window exceeding a certain value, the window containing a certain number of distinct elements, etc.
+4. `Shrink the Window:` If the window condition is broken, we start shrinking the window from the left by moving the `left` pointer towards the right. As we remove elements from the window, we update the `curr` state accordingly. We keep shrinking the window until the window condition is satisfied again.
+5. `Update the Answer:` After each expansion, we update our final answer `ans` based on the current window state `curr`. This could be the maximum or minimum window size, the maximum or minimum window sum, etc.
+6. `Repeat:` We repeat steps 2-5 until the `right` pointer has gone through every element in the array.
+
+### 3. Time Complexity:
+
+The time complexity of the sliding window algorithm is generally O(n)
