@@ -66,6 +66,7 @@ export default navbar([
     children: [
       { text: "Java", icon: "pen-to-square", link: "java" },
       { text: "Cheatsheet", icon: "pen-to-square", link: "cheatsheet" },
+      { text: "SQL", icon: "pen-to-square", link: "sql" },
     ],
   },
 ]);
