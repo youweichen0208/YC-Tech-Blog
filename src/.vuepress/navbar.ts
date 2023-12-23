@@ -48,9 +48,12 @@ export default navbar([
     children: [
       { text: "Dynamic Programming", icon: "pen-to-square", link: "dp" },
       { text: "Sliding Window", icon: "pen-to-square", link: "sliding-window" },
-      { text: "backtracking", icon: "pen-to-square", link: "backtracking" },
+      { text: "Backtracking", icon: "pen-to-square", link: "backtracking" },
       { text: "Two Pointers", icon: "pen-to-square", link: "two-pointers" },
       { text: "Prefix Sum", icon: "pen-to-square", link: "prefix-sum" },
+      { text: "Quick Sort", icon: "pen-to-square", link: "quick-sort" },
+      { text: "DFS", icon: "pen-to-square", link: "dfs" },
+      { text: "Linked List", icon: "pen-to-square", link: "linked-list" },
     ],
   },
   {
