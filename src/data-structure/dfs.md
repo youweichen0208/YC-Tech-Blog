@@ -28,6 +28,8 @@ public int dfs(TreeNode root) {
 }
 ```
 
+- **ans** is the final answer or the answer at the each step.
+
 ## Illustration:
 
 ![DFS graph](/assets/images/dfs.jpg)
