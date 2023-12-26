@@ -29,6 +29,10 @@ heap.add(1);
 heap.add(2);
 heap.add(3);
 
+// Add multiple elements from a collection
+List<Integer> additionalElements = Arrays.asList(4, 5, 6);
+heap.addAll(additionalElements);
+
 // Check minimum element
 heap.peek(); // 1
 
@@ -36,7 +40,7 @@ heap.peek(); // 1
 heap.remove(); // 1
 
 // Get size
-heap.size(); // 2
+heap.size(); // 5
 
 // Bonus: if you want a max heap instead, you can pass
 // Comparator.reverseOrder() to the constructor:

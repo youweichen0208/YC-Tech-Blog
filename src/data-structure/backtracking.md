@@ -24,7 +24,7 @@ To summarize the difference between exhaustive search and backtracking:
 In an exhaustive search, we generate all possibilities and then check them for solutions. In backtracking, we prune paths that cannot lead to a solution, generating far fewer possibilities.
 ```
 
-## 2. Implementation:
+## 2. Backtracking code template:
 
 ```text
 // let curr represent the thing you are building
@@ -97,11 +97,11 @@ class Solution {
 - Therefore, the total time complexity is O(n\*n!)
 
 ##### The space complexity of this code is O(n)
+
 the maximum depth of the recursion (the maximum length of the `curr` list). This is because the code uses recursion to generate permutations, and each recursive call adds a new element to the `curr` list.
 
 ## 4. When should we use backtracking?
+
 - Permutations and Combinations: If we need to generate all permutations or combinations of a set of items, we can use backtracking to build each possibility one item at a time, and abandon a partial permutation or combination as soon as we know it can't be extended to a valid one.
 - Path Finding: In problems where we need to find a path from one pointer to another, such as in a maze or a graph, backtracking can be used to incrementally build paths, and abandon a path as soon as we know it doesn't lead to the destination.
 - Subset Sum and Partitioning Problems: Backtracking can be used to find subsets of items that meet certain criteria, like a subset of numbers that adds up to a particular sum.
-
-

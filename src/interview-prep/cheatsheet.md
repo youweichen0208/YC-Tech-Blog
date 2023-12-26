@@ -195,6 +195,15 @@ int[] arr = {1, 2, 3};
 String str = Arrays.toString(arr);
 ```
 
+### `asList`
+
+The `Arrays.asList()` method in Java is used to convert an array into a List.
+
+```java
+String[] arr = {"one", "two", "three"};
+List<String> list = Arrays.asList(arr);
+```
+
 ## Collections:
 
 ### Collections.sort:
