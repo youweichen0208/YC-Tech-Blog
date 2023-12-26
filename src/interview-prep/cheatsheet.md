@@ -8,7 +8,9 @@ tag:
   - Java
 ---
 
-# 1. StringBuilder:
+# Java language cheatsheat
+
+## StringBuilder:
 
 ### append in StringBuilder:
 
@@ -102,9 +104,20 @@ StringBuilder sb = new StringBuilder("Hello, World!");
 int length = sb.length(); // Returns 13
 ```
 
-# **2. Converting Number to String:**
+## String section:
 
-### Using **String.valueOf()**:
+### Convert String to Array:
+
+we can convert a string to an array of its individual characters, we can use the `toCharArray()` method:
+
+```java
+String str = "Hello";
+char[] charArray = str.toCharArray();
+```
+
+### Converting Number to String:
+
+#### Using **String.valueOf()**:
 
 You can convert a number (e.g., int, double, float, etc.) to a string using the String.valueOf() method or by simply concatenating it with an empty string ("").
 
@@ -113,28 +126,32 @@ int number = 42;
 String str = String.valueOf(number); // or str = "" + number;
 ```
 
-# **3. Converting String to Number**:
+### Converting String to Number
 
-### Using **Integer.valueOf()**:
+#### Using **Integer.valueOf()**:
 
 To convert a string to an integer, we can use the `Integer.parseInt()` method. This method parses the string and returns an integer.
 
-### Using **Double.valueOf(**):
+#### Using **Double.valueOf(**):
 
 For converting strings to floating-point numbers, we can use the `Double.parseDouble` method.
 
-# **4. Arrays.sort()**:
+## Arrays
+
+The `Arrays` class in Java provides several static methods that can be used to manipulate arrays.
+
+### Arrays.sort():
 
 `Arrays.sort()` is a method in Java that is used to sort elements in an array in ascending order. It's part of the `java.util` package and is commonly used for sorting arrays of various types, including arrays of primitive data types and arrays of objects.
 
-### Sorting Arrays of Primitive Data Types:
+#### Sorting Arrays of Primitive Data Types:
 
 ```java
 int[] numbers = {5, 2, 9, 1, 5, 6};
 Arrays.sort(numbers); // Sorts the 'numbers' array in ascending order
 ```
 
-### Custom Comparator for Objects:
+#### Custom Comparator for Objects:
 
 ```java
 String[] words = {"apple", "banana", "cherry", "date"};
@@ -142,7 +159,45 @@ Arrays.sort(words, (a, b) -> Integer.compare(a.length(), b.length()));
 // Sorts 'words' by string length
 ```
 
-# **5. Collections.sort**:
+### `equals()`
+
+Returns `true` if the two specified arrays are equal to one another.
+
+```java
+int[] arr1 = {1, 2, 3};
+int[] arr2 = {1, 2, 3};
+boolean isEqual = Arrays.equals(arr1, arr2);
+```
+
+### `fill()`
+
+Assigns the specified value to each element of the specified array.
+
+```java
+int[] arr = new int[5];
+Arrays.fill(arr, 1);
+```
+
+### `copyOf()`
+
+The `Arrays.copyOf()` method in Java requires two parameters: the original array and the length of the new array. If we want to create a copy of the entire `original` array, we should specify the length of the `original` array as the second parameter.
+
+```java
+int[] copy2 = Arrays.copyOf(original, original.length);
+```
+
+### `toString()`
+
+returns a string representation of the contents of the specified array.
+
+```java
+int[] arr = {1, 2, 3};
+String str = Arrays.toString(arr);
+```
+
+## Collections:
+
+### Collections.sort:
 
 `Collections.sort()` is a method in Java used to sort elements in a collection in ascending order. Unlike `Arrays.sort()`, which is used to sort arrays, `Collections.sort()` is used with collections that implement the `List` interface.
 
@@ -175,7 +230,7 @@ Collections.sort(words, (a, b) -> Integer.compare(a.length(), b.length()));
 // Sorts 'words' by string length
 ```
 
-# **6.Common Methods in HashMap in Java:**
+## Common Methods in HashMap in Java:
 
 ### **containsKey(key):**
 
