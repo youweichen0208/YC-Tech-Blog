@@ -104,6 +104,13 @@ StringBuilder sb = new StringBuilder("Hello, World!");
 int length = sb.length(); // Returns 13
 ```
 
+## Char Section
+
+### count the frequency of letters:
+
+In Java, we can subtract 'A' from a character to get its position in the English alphabet. This works because characters in Java are represented as ASCII values.
+'A' corresponds to ASCII value 65, 'B' corresponds to 66, and so on up to 'Z'. So if we have a character that is an uppercase letter, value `X - 'A'` will give you a value from 0(for 'A') to 25(for 'Z').
+
 ## String section:
 
 ### Convert String to Array:
