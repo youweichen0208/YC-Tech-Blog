@@ -105,3 +105,10 @@ the maximum depth of the recursion (the maximum length of the `curr` list). This
 - Permutations and Combinations: If we need to generate all permutations or combinations of a set of items, we can use backtracking to build each possibility one item at a time, and abandon a partial permutation or combination as soon as we know it can't be extended to a valid one.
 - Path Finding: In problems where we need to find a path from one pointer to another, such as in a maze or a graph, backtracking can be used to incrementally build paths, and abandon a path as soon as we know it doesn't lead to the destination.
 - Subset Sum and Partitioning Problems: Backtracking can be used to find subsets of items that meet certain criteria, like a subset of numbers that adds up to a particular sum.
+
+## Lessons learned from backtracking
+
+1. In backtracking, we start from a certain point, and then explore all possible paths from there. Once the path is explored, we "undo" it and explore other paths.
+2. Even if a branch can lead to a solution, backtracking will still "undo" or backtrack after exploring that branch. This is because there might be other solutions that can be found by different choices at some point in the branch.
+3. "Undoing" doesn't mean reversing the order of the path. It means going back to a previous state and making a different choice to explore a different path.
+4. Use DFS when we need to visit every node in a graph, and use backtracking when we need to find a sequence of choices that satisfies a set of constraints.
