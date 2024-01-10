@@ -209,6 +209,19 @@ JOIN Products;
 
 This will return a result set that includes every combination of customer names and product names.
 
+## The SQL CASE Expression
+
+The `CASE` expression goes through conditions and returns a value when the first condition is met (like an if-then-else statement).
+
+```sql
+CASE
+    WHEN condition1 THEN result1
+    WHEN condition2 THEN result2
+    WHEN conditionN THEN resultN
+    ELSE result
+END;
+```
+
 ## What is an Index? Explain its different types.
 
 An index in SQL is a data structure that improves the speed of data retrieval operations on a database table. It works similarly to an index in a book: just as a book index helps you find information quickly without having to read every page, a database index provides a fast way to look up data without scanning every row in a table.
