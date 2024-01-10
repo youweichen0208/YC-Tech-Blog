@@ -128,40 +128,53 @@ The **SQL Join** clause is used to combine records (rows) from two or more table
 
 ### **INNER JOIN**:
 
+![inner join](/assets/images/inner-join.jpg)
+
 ```sql
-SELECT Orders.OrderID, Customers.Name, Orders.OrderAmount
-FROM Orders
-INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+SELECT column_name(s)
+FROM table1
+INNER JOIN table2
+ON table1.column_name = table2.column_name;
 ```
 
 Returns records that have matching values in both tables.
 
 ### **LEFT JOIN**:
 
+![left join](/assets/images/left-join.jpg)
+
 ```sql
-SELECT Orders.OrderID, Customers.Name, Orders.OrderAmount
-FROM Orders
-LEFT JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+SELECT column_name(s)
+FROM table1
+LEFT JOIN table2
+ON table1.column_name = table2.column_name;
 ```
 
 Returns all records from the left table, and the matched records from the right table. If there is no match, the result is NULL on the right side.
 
 ### **RIGHT JOIN**:
 
+![right join](/assets/images/right-join.jpg)
+
 ```sql
-SELECT Orders.OrderID, Customers.Name, Orders.OrderAmount
-FROM Orders
-RIGHT JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+SELECT column_name(s)
+FROM table1
+RIGHT JOIN table2
+ON table1.column_name = table2.column_name;
 ```
 
 Returns all records from the right table, and the matched records from the left table. If there is no match, the result is NULL on the left side.
 
 ### **FULL JOIN**:
 
+![full join](/assets/images/full-join.jpg)
+
 ```sql
-SELECT Orders.OrderID, Customers.Name, Orders.OrderAmount
-FROM Orders
-FULL JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+SELECT column_name(s)
+FROM table1
+FULL JOIN table2
+ON table1.column_name = table2.column_name
+WHERE condition;
 ```
 
 Returns all records when there is a match in either the left or the right table.
@@ -171,9 +184,9 @@ Returns all records when there is a match in either the left or the right table.
 A self-join in SQL is a way to combine rows of the same table when there's a match based on some condition. It's used to combine and compare rows within the same table.
 
 ```sql
-SELECT A.EmployeeName AS Employee, B.EmployeeName AS Manager
-FROM Employees A, Employees B
-WHERE A.ManagerID = B.EmployeeID;
+SELECT column_name(s)
+FROM table1 T1, table1 T2
+WHERE condition;
 ```
 
 In this example, the `Employees` table is joined with itself using different aliases (`A` and `B`). The query returns a list of employees and their respective managers, where the `ManagerID` of one row in the table matches the `EmployeeID` of another row in the same table.
@@ -191,7 +204,7 @@ A cross join in SQL, also known as a Cartesian product, is a join operation that
 ```sql
 SELECT Customers.CustomerName, Products.ProductName
 FROM Customers
-CROSS JOIN Products;
+JOIN Products;
 ```
 
 This will return a result set that includes every combination of customer names and product names.
@@ -284,7 +297,7 @@ WHERE graduation_year = 2019
 ORDER BY studentID DESC;
 ```
 
-- **GROUP BY** clause in SQL is used to group records with identical data and can be used in conjunction with some aggregation functions to produce summarized results from the database.
+- **GROUP BY** clause in SQL is used to group records/rows that have the same values in specified columns into aggregated data. It's often used with aggregate functions (`COUNT`, `MAX`, `MIN`, `SUM`, `AVG`).
 - **HAVING** clause in SQL is used to filter records in combination with the GROUP BY clause. It is different from WHERE, since the WHERE clause cannot filter aggregated records.
 
 ```sql
@@ -329,6 +342,16 @@ SELECT name FROM Students   /* Fetch names from students */
 INTERSECT    /* that are present in contacts as well */
 SELECT name FROM Contacts;
 ```
+
+## datediff:
+
+`DATEDIFF` is a function in SQL that is used to find the difference between two dates. It returns the difference in terms of the unit specified.
+
+```mysql
+datediff(date1, date2)
+```
+
+In this case, `DATEDIFF` returns the difference in days between `date1` and `date2`.
 
 ## What are Entities and Relationships?
 
