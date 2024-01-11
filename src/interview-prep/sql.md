@@ -274,6 +274,8 @@ A query in SQL is a request for data or information from a database. Queries can
 
 A subquery in SQL is a query that is embedded within another query. It can be used to return data that will be used in the main query as a condition to further restrict the data to be retrieved. Subqueries can be used with SELECT, INSERT, UPDATE, and DELETE statements.
 
+- In SQL, **every table in a query needs to have a name.** This includes not just physical tables, but also derived tables, such as subqueries in the `FROM` clause. So when we use subquery to stand for table, we need to add alias to it.
+
 ### **Correlated Subquery**:
 
 A correlated subquery works like a nested loop: the subquery depends on the outer query and executes once for every row worked on by the outer query. It uses values from the outer query in its WHERE clause.
@@ -312,6 +314,7 @@ ORDER BY studentID DESC;
 
 - **GROUP BY** clause in SQL is used to group records/rows that have the same values in specified columns into aggregated data. It's often used with aggregate functions (`COUNT`, `MAX`, `MIN`, `SUM`, `AVG`).
 - **HAVING** clause in SQL is used to filter records in combination with the GROUP BY clause. It is different from WHERE, since the WHERE clause cannot filter aggregated records.
+- **Notice:** Aggregate functions like `count()`, `sum()`, `avg()`, etc, cannot be used in the `where` clause. They can only be used in the `select`, `having`, `order by` clauses.
 
 ```sql
 SELECT COUNT(studentId), country
@@ -548,4 +551,51 @@ ADD column_name datatype constraint;
 ```sql
 ALTER TABLE Customers
 ADD Email varchar(255);
+```
+
+## String functions / Regex / Clause
+
+### `SUBSTRING`: This function is used to extract a portion of a string.
+
+```sql
+SUBSTRING(string, start_position, length)
+```
+
+For example, `SUBSTRING('Hello World', 1, 5)` would return `Hello`.
+
+### `UPPER`: This function is used to convert all letters in a string to uppercase. The syntax is:
+
+```sql
+UPPER(string)
+```
+
+For example, `UPPER('Hello World')` would return `HELLO WORLD`.
+
+### String concatenation
+
+In MySQL, we can use the `CONCAT()` function:
+
+```sql
+SELECT CONCAT('Hello', ' ', 'World');
+```
+
+### GROUP_CONCAT
+
+`GROUP_CONCAT` is a built-in function in MYSQL that concatenates values from a group into a single string with various options. It is often used with the `GROUP BY` clause.
+
+Here is the basic syntax:
+
+```sql
+GROUP_CONCAT(expression SEPARATOR separator)
+```
+
+- `expression`: the expression to be concatenated.
+- `separator`: the separator between each concatenated value. If omitted, the function uses a comma (,) as the default separator.
+
+Here's an example:
+
+```sql
+SELECT GROUP_CONCAT(product SEPARATOR ', ')
+FROM Activities
+GROUP BY sell_date;
 ```

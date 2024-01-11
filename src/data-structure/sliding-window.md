@@ -52,3 +52,16 @@ public int fn(int[] arr) {
 ### 3. Time Complexity:
 
 The time complexity of the sliding window algorithm is generally O(n)
+
+### 4. Related techniques we can use in sliding window:
+
+1. left & right pointer
+2. Use integer array to represent 26 English alphaset based on the ASCII value and keep track of frequency count of characters.
+
+For example,
+
+```java
+int[] count = new int[26];
+//'B' - 'A' = 1, 'C' - 'A' = 2, and so forth...
+count['B' - 'A']++;
+```
