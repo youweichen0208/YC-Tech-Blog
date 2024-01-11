@@ -366,7 +366,7 @@ No, we cannot override the private methods because the scope of private methods 
 
 Yes, we can change the scope of the overriden method in the subclass. However, we must notice that we cannot decrease the accessility of the method (which means we can't change public to private, but we can change private to public).
 
-### Can we modify the throws calsue of the superclass method while overriding it in the subclass?
+### Can we modify the throws clause of the superclass method while overriding it in the subclass?
 
 Yes, we can modify the throws clause of the superclass method while overriding it in the subclass. However, there are some rules which are to be followed while overriding while overriding in case of exception handling.
 

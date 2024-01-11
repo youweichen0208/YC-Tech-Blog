@@ -56,7 +56,7 @@ The time complexity of the sliding window algorithm is generally O(n)
 ### 4. Related techniques we can use in sliding window:
 
 1. left & right pointer
-2. Use integer array to represent 26 English alphaset based on the ASCII value and keep track of frequency count of characters.
+2. Use integer array to represent 26 English alphaset based on the ASCII value and keep track of frequency count of characters (usually used to handle the frequency problems related to 26 characters and deal with longest/maximum problems).
 
 For example,
 
