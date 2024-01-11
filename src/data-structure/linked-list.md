@@ -50,29 +50,6 @@ In the worst-case scenario, we will need to traverse all the nodes in the linked
 
 The fast and slow pointers are the only extra space used, and the amount of space does not change with the size of the linked list, hence the space complexity is constant.
 
-## Reversing a linked list
-
-### template code
-
-```java
-public ListNode fn(ListNode head) {
-    ListNode curr = head;
-    ListNode prev = null;
-    while (curr != null) {
-        ListNode nextNode = curr.next;
-        curr.next = prev;
-        prev = curr;
-        curr = nextNode;
-    }
-
-    return prev;
-}
-```
-
-### Time Complexity: O(n)
-
-### Space Complexity: O(1)
-
 ## What is dummy node and when should we use the dummy node?
 
 Using a dummy node in a linked list is a technique that can simplify certain operations and edge cases.
@@ -104,3 +81,63 @@ Using a dummy node in a linked list is a technique that can simplify certain ope
 - **Use Cases:**
   - **Array List:** Array lists are preferable when you need to access elements frequently by their index and when the list size remains relatively constant.
   - **Linked List:** Linked lists are preferable when you need to frequently add and remove elements, but the order of elements and random access isn't important.
+
+## Related techniques in Linkedlist:
+
+1. reverse linked list:
+   given the `head` of a singly linked list, reverse the list, and return the reversed list.
+
+```java
+    public ListNode reverseList(ListNode head) {
+        ListNode curr = head;
+        ListNode prev = null;
+
+        while (curr != null) {
+            ListNode temp = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = temp;
+        }
+
+        return prev;
+    }
+```
+
+2. merge two sorted list:
+   Merge the two lists into one sorted list.
+
+```java
+    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+        ListNode ptr1 = list1;
+        ListNode ptr2 = list2;
+        ListNode result = new ListNode(-1);
+        ListNode curr = result;
+        while (ptr1 != null || ptr2 != null) {
+            if (ptr1 == null) {
+                curr.next = ptr2;
+                ptr2 = ptr2.next;
+                curr = curr.next;
+                continue;
+            }
+
+            if (ptr2 == null) {
+                curr.next = ptr1;
+                ptr1 = ptr1.next;
+                curr = curr.next;
+                continue;
+            }
+
+            if (ptr1.val <= ptr2.val) {
+                curr.next = ptr1;
+                ptr1 = ptr1.next;
+                curr = curr.next;
+            }
+            else {
+                curr.next = ptr2;
+                ptr2 = ptr2.next;
+                curr = curr.next;
+            }
+        }
+        return result.next;
+    }
+```

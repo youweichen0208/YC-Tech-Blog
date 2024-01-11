@@ -89,3 +89,12 @@ The time complexity of DFS is O(N), where N is the number of nodes in the tree. 
 ### Space Complexity:
 
 The space complexity of DFS is O(H), where H is the height of the tree. This is because in the worst-case scenario, the maximum amount of space is used when the algorithm needs to store information for traversing all the way down to the leaf node along a single branch, which corresponds to the height of the tree.
+
+## What is the difference between binary tree and binary search tree?
+
+- **Binary Tree**: In a binary tree, there are no restrictions on the value of the nodes. The left child and right child of a node do not have specific order.
+- **Binary Search Tree**: In a BST, for each node, all elements in the left subtree are less than the node, and all elements in the right subtree are greater than the node. This property applies to each node in the tree, not just the root, and makes searching for a value very efficient.
+
+## Related techniques in dfs:
+
+- we can use inorder traversal to find the kth smallest element in the binary search tree(BST). In BST, inorder traversal will start from the smallest element in the tree, and go to 2nd smallest,...
