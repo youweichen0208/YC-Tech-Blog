@@ -72,4 +72,11 @@ export default navbar([
       { text: "SQL", icon: "pen-to-square", link: "sql" },
     ],
   },
+
+  {
+    text: "Backend",
+    icon: "pen-to-square",
+    prefix: "/backend/",
+    children: [{ text: "Spring", icon: "pen-to-square", link: "spring" }],
+  },
 ]);

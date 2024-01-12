@@ -21,6 +21,12 @@ export default sidebar({
       prefix: "projects/",
       children: "structure",
     },
+    {
+      text: "Backend",
+      icon: "p",
+      prefix: "backend/",
+      children: "structure",
+    },
     "intro",
   ],
 });
