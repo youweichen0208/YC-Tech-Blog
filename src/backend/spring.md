@@ -2,7 +2,7 @@
 icon: pen-to-square
 date: 2024-01-11
 category:
-  - interview
+  - backend
 tag:
   - Java
   - Spring
