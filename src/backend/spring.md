@@ -91,6 +91,8 @@ public class AppConfig {
 
 ### `@Qualifier`: The `@Qualifier` annotation in Spring is used tp resolve ambiguity where they are multiple beans of the same type and we want to wire only one of them with a property.
 
+### `@Qualifier` has higher priority than @Primary
+
 ## How to retrieve beans from the Spring Application Context by its name or ID?
 
 To get a bean object in the main method of a Spring application, we can use the `ApplicationContext.getBean()` method.
@@ -116,3 +118,112 @@ context.getBean(Person.class);
 
 - **Spring Bean:** Any Java object that is managed by Spring
   - Spring uses IOC Container (Bean Factory or ApplicationContext) to manage these objects.
+
+## Dependency Injection
+
+In Spring framework, Dependency Injection (DI) is a design pattenr and a fundamental concept that deals with how components get their dependencies. The primary purpose of DI is to achieve loose coupling between classes and promote easier testing and maintainability.
+
+For example, imagine we have a toy car. This toy car needs batteries to work. Now instead of putting the batteries inside the car ourselves, we have a friendly robot assistant who puts the batteries in for us. In the world of programming, the toy car is like our program or application, and the batteries are like the things our program need to work (we call them dependencies). Dependency Injection(DI) is like having that helpful robot(DI container) automatically provide and connect these necessary things for our program.
+
+### 1. Constructor-Based Dependency Injection:
+
+```java
+public class MyClass {
+    private final MyDependency dependency;
+    public MyClass(MyDependency dependency) {
+        this.dependency = dependency;
+    }
+    // rest of the class...
+}
+```
+
+- We don't need to use `@Autowired` directly on the constructor and on setter methods. Instead, Spring automatically recognizes constructors with parameters and injects the dependencies based on the types of parameters.
+- **Pros:**
+  - Promotes immutability
+  - Ensures that the object is fully initialized before use.
+  - Well-suited for mandatory dependencies
+  - always recommended
+
+## 2. Setter-Based Dependency Injection:
+
+```java
+public class MyClass {
+    private MyDependency dependency;
+
+    public void setDependency(MyDependency dependency) {
+        this.dependency = dependency;
+    }
+
+    // rest of the class...
+}
+```
+
+- Dependencies are injected through setter methods
+- **Pros**:
+  - Provides flexibility as dependencies can be changed after object creation
+  - Useful when we have optional dependencies.
+
+## 3. Field-Based Dependency Injection:
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class MyClass {
+    @Autowired
+    private MyDependency dependency;
+
+    // rest of the class...
+}
+
+```
+
+- Dependencies are injected directly into fields of a class, often using annotations like `@Autowired`.
+- **Pros**:
+  - Concise and requires less boilerplate code.
+  - Suitable for cases where we don't need to enforce encapsulation for the dependency.
+- **Cons**:
+  - Can make testing more challenging.
+  - May violate encapsulation principles if used for mandatory dependencies.
+
+Using `@Autowired` is a way to inform Spring's IoC container about the dependencies that need to be injected. It's more commonly associated with field injection, but for constructor and setter injection, Spring infers the injection points based on the method signatures.
+
+## @Component:
+
+`@Component` is a stereotype annotation used to indicate that a class is a Spring component. Components are Java objects managed by the Spring IoC container. They are typically represent and manage the various parts of our application, such as services, controllers, repositories, etc.
+
+```java
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyComponent {
+    // class implementation...
+}
+```
+
+- By annotating a class with `@Component`, we are telling Spring to automatically detect and register this class as an bean in the application context.
+
+## @ComponentScan:
+
+`@ComponentScan` is used at the class level to enable component scanning in Spring. It tells Spring where to look for components (classes annotated with `@Component`, `@Service`, `@Reposotpru`, etc.) in our project.
+
+```java
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan(basePackages = "com.example")
+public class AppConfig {
+    // configuration class...
+}
+```
+
+- In the example above, `@ComponentScan` is used in a configuration class (`@Configuration`). The `basePackages` attribute specifies the base package where Spring should look for components.
+- Spring will scan the specified package and its sub-packages, identifying classes annotated with `@Component` (or related annotations) and registering them as beans in the application context.
+- `@ComponentScan` is often used in conjunction with `@Configuration` to define the configuration for the Spring application context.
+  - `@ComponentScan` allows us to specify the base package(s) where Spring should scan for components, and it automatically registers those components as beans in the context.
+  - `@Configuration` allows us to define additional beans, configure aspects of the container, and manage other settings.
+  - Tother, they provide a powerful mechanism for setting up a Spring application context without the need for extensive manual bean registration.
+
+## Autowiring:
+
+Autowiring is a feature in the Spring framework that allows the Spring IoC(Inversion of Control) container to automatically inject dependencies into a Spring bean. Instead of manually specifying the dependencies or using explicit injection methods, autowiring lets Spring handle the wiring of beans automatically.
