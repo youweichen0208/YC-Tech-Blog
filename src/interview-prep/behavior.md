@@ -20,7 +20,7 @@ The STAR method is an interview technique that gives us a straightforward format
 
 ## Self-introduction:
 
-Good morning/afternoon/evening, my name is Youwei Chen. I was a master student studying computer science in Virginia Tech, and I just graduated this December. I am a passionate person in programming. Back in 2019, I got an internship in Tencent and was assigned a couple of testing and API documentation tasks. I used Swagger2 to build and document the API. For the personal projects, I have also done a couple of online ecommerce websites to improve my technical skills. I am also very good at Java. Java is my first language I have learned since I started programming. So I think I am a great fit for this Java batch.
+Good morning/afternoon/evening, my name is Youwei Chen. I was a master student studying computer science in Virginia Tech, and I just graduated this December. I am a passionate person in programming. Back in 2019, I got an internship in Tencent and was assigned a couple of testing and API documentation tasks. I used Swagger2 to build and document the API. For the personal projects, I have also done a couple of online ecommerce websites to improve my technical skills. I am also very good at Java. Java is my first language I learned since I started programming. So I think I am a great fit for this Java batch.
 
 ## talk about the project:
 

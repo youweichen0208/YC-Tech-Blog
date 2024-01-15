@@ -581,21 +581,25 @@ SELECT CONCAT('Hello', ' ', 'World');
 
 ### GROUP_CONCAT
 
-`GROUP_CONCAT` is a built-in function in MYSQL that concatenates values from a group into a single string with various options. It is often used with the `GROUP BY` clause.
+`GROUP_CONCAT` function returns a string with concatenated non-NULL value from a group. It is used to concatenate and aggregate values from multiple rows within a specific column into a single String with a default `,` as the separator (val1, val2, val3, ...).
 
-Here is the basic syntax:
+### Syntax:
 
 ```sql
-GROUP_CONCAT(expression SEPARATOR separator)
+GROUP_CONCAT(expr);
 ```
 
-- `expression`: the expression to be concatenated.
-- `separator`: the separator between each concatenated value. If omitted, the function uses a comma (,) as the default separator.
+## SQL wildcard:
 
-Here's an example:
+In SQL, wildcards are special characters used to substitute one or more characters in a string. They are used with the SQL `LIKE` operator. The two commonly used wildcards are:
+
+1. `%`: the percent sign represents zero, one, or multiple characters. For example, `LIKE 'a%'` will match any string beginning with "a".
+2. `_`: the underscore represents a single character. For example, `LIKE 'a_'` will match any two-character string that starts with "a".
 
 ```sql
-SELECT GROUP_CONCAT(product SEPARATOR ', ')
-FROM Activities
-GROUP BY sell_date;
+SELECT column FROM table WHERE column LIKE 'a%'; -- finds any values that start with "a"
+SELECT column FROM table WHERE column LIKE '%a'; -- finds any values that end with "a"
+SELECT column FROM table WHERE column LIKE '%a%'; -- finds any values that have "a" in any position
+SELECT column FROM table WHERE column LIKE '_a%'; -- finds any values that have "a" at the second position
+SELECT column FROM table WHERE column LIKE 'a__%'; -- finds any values that start with "a" and are at least 3 characters in length
 ```
