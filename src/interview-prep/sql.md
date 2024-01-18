@@ -603,3 +603,14 @@ SELECT column FROM table WHERE column LIKE '%a%'; -- finds any values that have 
 SELECT column FROM table WHERE column LIKE '_a%'; -- finds any values that have "a" at the second position
 SELECT column FROM table WHERE column LIKE 'a__%'; -- finds any values that start with "a" and are at least 3 characters in length
 ```
+
+## OFFSET
+
+The `OFFSET` clause is SQL is used to skip a certain number of rows before returning the result set from a query. It's often used with the `LIMIT` clause to implement pagination in SQL queries.
+
+```sql
+select * from table
+limit 10 offset 20;
+```
+
+This query will skip the first 20 records and then return the next 10 records from the table.

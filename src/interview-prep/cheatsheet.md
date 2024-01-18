@@ -113,6 +113,20 @@ In Java, we can subtract 'A' from a character to get its position in the English
 
 ## String section:
 
+### Replace all non-alphanumeric characters
+
+```java
+ String curr = s.replaceAll("[^a-zA-Z0-9]", "");
+```
+
+The line of code is using a regular expression to remove all non-alphanumeric characters from a string in Java.
+
+- to remove all non-alphabetic from the string
+
+```java
+String curr = s.replaceAll("[^a-zA-Z]", "");
+```
+
 ### Convert String to Array:
 
 we can convert a string to an array of its individual characters, we can use the `toCharArray()` method:
