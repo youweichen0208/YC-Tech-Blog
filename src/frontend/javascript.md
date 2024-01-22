@@ -339,25 +339,3 @@ console.log(jsonString); // Outputs: '{"name":"John","age":30,"city":"New York"}
 ### Why we need JSON.stringify()?
 
 In JavaScript, when we use an object(including arrays) as a key in another object, the key is not the actual object, but a reference to that object. That means two identical-looking objects or arrays are not considered the same key, because they are different instances and thus have different references.
-
-## Promises in JavaScript
-
-### Introduction to Promises
-
-A promise in JavaScript is an object representing the eventual completion or failure of an asynchronous operation. Promises are commonly used for handling asynchronous tasks like fetching data, making API calls, or dealing with timeouts.
-
-### Creating a Promise
-
-We can create a promise using the `Promise` constructor, which takes a function as an argument. This function receives two parameters: `resolve` and `reject`.
-
-```javascript
-const myPromise = new Promise((resolve, reject) => {
-  // Asynchronous operation or computation
-
-  // If the operation is successful:
-  resolve("Success!");
-
-  // If the operation encounters an error:
-  // reject("Error occurred!");
-});
-```
