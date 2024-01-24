@@ -108,3 +108,72 @@ public class MyController {
 ```
 
 - **Explanation**: The `RequestMapping` annotation at the class level("/example") specifies a base URL for all methods in the class. The method-level `@RequestMapping` ("/hello") further refines the URL mapping. Additionally, the `method` attribute specifies that it handles HTTP GET requests.
+
+## spring.mvc.view.prefix/suffix:
+
+The configuration `spring.mvc.view.prefix` and `spring.mvc.view.suffix` in Spring MVC is used to specify where Spring MVC should look for JSP files associated with logical view names returned by controllers. If we were to use `@ResponseBody` in a controller method, it would typically indicate that the method returns the response body directly (e.g. a JSON string) rather than a logical view name. The view resolution wouldn't be involved in such cases.
+
+```properties
+spring.mvc.view.prefix=/WEB-INF/jsp/
+spring.mvc.view.suffix=.jsp
+```
+
+- `spring.mvc.view.prefix=/WEB-INF/jsp/` specifies the prefix that will be added to the logical view names returned by controllers to form the actual path to the JSP files. In this case, it indicates that JSP files are located in the `/WEB-INF/jsp/` directory.
+- `spring.mvc.view.suffix=.jsp`: This property specifies the suffix that will be added to the logical view names. In this case, it indicates that the view names correspond to JSP files, and their file extension is `.jsp`.
+
+## @RequestParam
+
+The `RequestParam` annotation in Spring MVC is used to extract values from the query parameters or form data of an HTTP request. This is commonly used when we need to retrieve data from the URL or form submissions.
+
+```java
+    @RequestMapping("/login")
+    public String gotoLoginPage(@RequestParam String name, ModelMap model) {
+        model.put("name", name);
+        System.out.println("Request param is " + name); //not recommended for production code
+        return "login";
+    }
+```
+
+`ModelMap` is a class in the Spring Framework that implements the `Model` interface. It is used to pass data from a controller method to the view in a Spring MVC application.
+
+```jsp
+<html>
+<head><title>Login</title>
+</head>
+
+<body>
+Hello, welcome to the Login page! ${name}
+</body>
+</html>
+```
+
+## MVC pattern
+
+The MVC(Model-View-Controller) pattern is a software architectural pattern used for designing and structuring applications, especially in the context of user interfaces and web applications.
+
+1. Model:
+
+- The Model represents the application's data and business logic.
+- In the context of web applications, the Model typically interacts with a database, performs data processing, and encapsulates the application's core functionality.
+
+2. View:
+
+- The View is responsible for presenting the data to the user and handling user interfaces.
+- Views are often the graphical user interfaces, web pages, or any other represnetation of data that users can perceive.
+
+3. Controller:
+
+- The Controller acts as an intermediary between the Model and the View.
+- Controllers are responsible for handling user requests, managing the flow of control, and updating the Model and View as needed.
+
+## Dispatcher Servlet and Front Controller
+
+In a Spring MVC application, the Dispatcher Servlet is a pre-configured and acts as the front controller, which receives all incoming HTTP requests and delegates the processing to the appropriate controllers, which we define using the `@Controller` annotation.
+
+### Dispatcher Servlet Dispatching:
+
+- When an HTTP request is received, the Dispatcher Servlet is responsible for determining which controller should handle the request based on the URL mappings
+- The Dispatcher Servlet then invokes the appropriate method in the chosen controller to process the request
+- The result of the controller method (a logical view or a response) is returned to the Dispatcher Servlet.
+
+In summary, controllers marked with `@Controller` are indeed the sub-controllers that handle specific requests. The Dispatcher Servlet is the central controller that takes the overall request-handling process, determining which controller should handle a particular request and coordinating the flow of request through the application.

@@ -291,3 +291,53 @@ management.endpoints.web.exposure.include=*
 ### 3. Run our Application
 
 url: http://localhost/actuator
+
+## Logger
+
+In Spring Boot, a `Logger` is an interface provided by the SLF4j logging framework. It is used for logging messages at various levels of severity, such as debug, info, warn, and error.
+
+### Logger Initialization:
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MyClass {
+    private Logger logger = LoggerFactory.getLogger(MyClass.class);
+
+    // ...
+}
+```
+
+In a class, we typically declare a private `Logger` instance using the LoggerFactory
+
+### Logging Levels:
+
+```java
+logger.debug("This is a debug message");
+logger.info("This is an info message");
+logger.warn("This is a warning message");
+logger.error("This is an error message");
+```
+
+we can use different logging levels to indicate the severity of the message.
+
+### Parameterized Logging:
+
+```java
+String user = "John";
+int age = 25;
+logger.info("User {} is {} years old", user, age);
+```
+
+we can use parameterized logging to improve performance and readability.
+
+### configure the logging levels for specific packages in a Spring Boot application.
+
+```properties
+logging.level.org.springframework=info
+logging.level.com.miniproject.springboot.miniprojectdemo=debug
+```
+
+- `logging.level.org.springframework=info`: This line sets the logging level for the `org.springframework` package to info. This means that log messages at the `debug` level (and below) will NOT be included in the logs. Log messages at the `info` level and higher (e.g. `warn`, `error`) will be included.
+- `logging.level.com.miniproject.springboot.miniprojectdemo=debug`: This line sets the logging level for the package `com.miniproject.springboot.miniprojectdemo` to `debug`. This means that log messages at the `trace` level `debug`, `info`, and higher will be included in the logs for classes in this specific package.
