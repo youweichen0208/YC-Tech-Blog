@@ -341,3 +341,20 @@ logging.level.com.miniproject.springboot.miniprojectdemo=debug
 
 - `logging.level.org.springframework=info`: This line sets the logging level for the `org.springframework` package to info. This means that log messages at the `debug` level (and below) will NOT be included in the logs. Log messages at the `info` level and higher (e.g. `warn`, `error`) will be included.
 - `logging.level.com.miniproject.springboot.miniprojectdemo=debug`: This line sets the logging level for the package `com.miniproject.springboot.miniprojectdemo` to `debug`. This means that log messages at the `trace` level `debug`, `info`, and higher will be included in the logs for classes in this specific package.
+
+## Build Faster with Spring Boot DevTools:
+
+Spring Boot DevTools is a set of tools that makes the process of developing Spring Boot applications more convenient.
+
+- Automatic Restart: DevTools monitors our classpath for changes and automatically restarts the application when it detects a change. This saves us from having to manually stop and start our application every time we make a change.
+- Live Reload: DevTools includes a LiveReload server that can automatically refresh our browser when it detects changes to our files.
+- **Remember:** For pom.xml dependency changes, we will need to restart server manually
+
+```xml
+       <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+```

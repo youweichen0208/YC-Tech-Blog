@@ -1100,3 +1100,69 @@ public class Singleton {
     }
 }
 ```
+
+## downcasting and upcasting in Java
+
+### Upcasting:
+
+- Definition: upcasting involves concerting a reference from a subclass type to a reference of its superclass type.
+
+- Example:
+
+```java
+class Animal {
+    void makeSound() {
+        System.out.println("Generic Animal Sound");
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        System.out.println("Woof! Woof!");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog myDog = new Dog();
+        Animal animalReference = myDog; // Upcasting
+        animalReference.makeSound();   // Accessing method of the superclass
+    }
+}
+```
+
+### Downcasting:
+
+- Definition: Downcasting involves converting a reference from a super class type to a reference of its subclass type.
+
+- Example:
+
+```java
+class Animal {
+    void makeSound() {
+        System.out.println("Generic Animal Sound");
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        System.out.println("Woof! Woof!");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal animalReference = new Dog();
+        // Downcasting
+        if (animalReference instanceof Dog) {
+            Dog myDog = (Dog) animalReference;
+            myDog.bark();
+        }
+    }
+}
+```
+
+- Upcasting is always safe and can be done implicitly
+- Downcasting requires explicit casting and should be done cautiously, ensuring that the object being referenced is of the expected subclass type.
+- Attempting to downcast an object to an unrelated type will result in a `ClassCastException`.
+- It is a good practice to use `instanceof` to check the type before attempting downcasting.
