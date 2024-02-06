@@ -81,7 +81,7 @@ tag:
 
 - React component names must always start with a capital letter
 
-![React Component]('/assets/images/component.png')
+![React Component](/assets/images/component.png)
 
 ## Understanding State in React
 
