@@ -243,3 +243,222 @@ public class MyRestController {
     }
 }
 ```
+
+## What is the difference between @RequestMapping and @GetMapping?
+
+In summary, while `@RequestMapping` is a more general-purpose annotation that can handle multiple HTTP methods and can be used at both class and method levels, `@GetMapping` is a specialized annotation specifically designed for handling HTTP GET requests. Using `@GetMapping` can make our code more concise and easier to understand when we are specifically dealing with GET requests.
+
+## What is @PathVariable
+
+The `@PathVariable` annotation in Spring MVC is used to extract values from the URI template and bind them to method parameters. It allows us to capture values from the URI and use them in our controller methods.
+
+```java
+@Controller
+@RequestMapping("/example")
+public class ExampleController {
+
+    @GetMapping("/greet/{name}")
+    public String greetUser(@PathVariable String name) {
+        // The value of {name} from the URI will be bound to the 'name' parameter
+        return "Hello, " + name + "!";
+    }
+}
+```
+
+Key points about `@PathVariable`:
+
+1. Annotation Usage:
+
+- `@PathVariable` is used as a method parameter annotation in the controller methods.
+
+2. Variable Binding:
+
+- It binds the value of a URI template variable (e.g. `{name}` in the example) to a method parameter.
+
+3. Specifying URI Template Variables:
+
+- We can use the `value` attribute of `@PathVariable` to explicitly specify the name of the URI template variable.
+
+```java
+@GetMapping("/user/{userId}")
+public String getUserById(@PathVariable(value = "userId") Long id) {
+    // ...
+}
+
+```
+
+4. Optional Variables:
+
+- we can make path variables optional by specifying the `required` attribute.
+
+```java
+@GetMapping("/user/{userId}")
+public String getUserById(@PathVariable(name = "userId", required = false) Long id) {
+    // ...
+}
+```
+
+## What is DAO?
+
+DAO stands for "Data Access Object". A DAO is a design pattern that provides an abstract interface to some type of database or other persistence mechanism. **It separates the business logic of an application from the details of how data is accessed and manipulated.**
+
+## Service:
+
+- In the context of web services, a service is a broader term referring to a component or module that provides specific functionality. A service can include business logic, coordination of multiple operations, and interaction with various components, including DAOs.
+
+Example of a simple service using DAO:
+
+```java
+@Service
+public class UserService {
+
+    @Autowired
+    private UserDao userDao;
+
+    public User getUserById(Long id) {
+        return userDao.findById(id);
+    }
+
+    public List<User> getAllUsers() {
+        return userDao.findAll();
+    }
+
+    public void saveUser(User user) {
+        userDao.save(user);
+    }
+
+    // Other business logic...
+}
+```
+
+- **JPA(Java Persistence API) is not a DAO itself; instead, JPA is a technology or specification that can be used to implement Data Access Objects (DAOs) in Java applications.**
+
+## @RequestBody
+
+The `@RequestBody` annotation in Spring is used to indicate that a method parameter should be bound to the body of the HTTP request. When a method parameter is annotated with `@RequestBody`, Spring will automatically deserialize the content of the request body into the corresponding Java object.
+
+```java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    @PostMapping("/create")
+    public ResponseEntity<String> createUser(@RequestBody User user) {
+        // Process the user object received in the request body
+        // (Assuming User is a class representing user data)
+
+        // Return a response, e.g., a success message
+        return ResponseEntity.ok("User created successfully");
+    }
+}
+```
+
+In this example, the `createUser` method receives a `User` object as a parameter, and the `@RequestBody` annotation instructs Spring to deserialize the JSON or XML content from the request body into a `User` object.
+
+Key points about `@RequestBody`:
+
+1. Annotation Usage:
+
+- `@RequestBody` is used as a method parameyer annotation in Spring MVC controllers.
+
+2. Data Binding:
+
+- It binds the content of the HTTP request body to a method parameter
+
+3. Supported Content Types:
+
+- `@RequestBody` supports a variety of content types, including JSON, XML, form data, and more. The appropriate message converter is chosen based on the `Content-Type` header of the request.
+
+4. Deserialization:
+
+- Spring uses the configured message converters to deserialize the request body content into the specific parameter type.
+
+## ResponseEntity
+
+`ResponseEntity` is a class in Spring Framework that represents the entire HTTP response, including the status code, headers, and body. It is commonly used in Spring MVC controllers to customize the response sent back to the client. `ResponseEntity` provides a flexible and expressive way to build and customize HTTP responses.
+
+## URI Location
+
+`URI Location` is a variable that represents a Uniform Resource Identifier (URI) pointing to the newly created resource. In this specific scenario, the URI is constructed for the recently saved user.
+
+```java
+    @PostMapping("/users")
+    public ResponseEntity<Object> createUser(@RequestBody User user){
+        User savedUser = service.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId()).toUri();
+        // location - /users/4
+        return ResponseEntity.created(location).build();
+    }
+```
+
+1. ` URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId()).toUri();`:
+
+- This line constructs a URI for the newly created resource(`savedUser`). It uses the `ServletUriComponentBuilder` to get the current request's URI, appends "/{id}" to it (where `{id}` is a path variable for the user's ID), and then expands it with the actual ID of the saved user.
+
+2. `return ResponseEntity.created(location).build();`:
+
+- This method returns a `ResponseEntity` with a status of 201 Created.
+- The `location` header of the response is set to the URI of the newly created resource, indicating where the client can find the resource.
+- The `build()` method finalizes the `@ResponseEntity` and completes the response.
+
+This aligns with RESTFUL API principles, making it clear to the client where the newly created resource can be located.
+
+## Implement Generic Exception Handling:
+
+### @ControllerAdvice
+
+`@ControllerAdvice` is an annotation in the Spring Framework that allow us to define global advice or exception handlers that apply to all controllers or a subset of controllers. It is commonly used to centralize exception handling and other cross-cutting concerns in a Spring MVC application.
+
+### ResponseEntityExceptionHandler
+
+- `@ResponseEntityExceptionHandler` is a base class provided by the Spring Framework that is intended for global exception handling in a Spring MVC application.
+- When we create a class that extends `ResponseEntityExceptionHandler`, we can override its methods to handle specific exceptions and return custom `@ResponseEntity` instances. This is commonly used for responding to exceptions with specific HTTP status codes, headers, and bodies.
+
+Let's take a look at the example code:
+
+```java
+@ControllerAdvice
+public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<ErrorDetails> handleAllException(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public final ResponseEntity<ErrorDetails> handleUserNotFoundException(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+}
+```
+
+- `@ExceptionHandler(Exception.class)`: This annotation on the `handleAllException` method specifies that this method will handle exceptions of type `Exception`. In other words, it is a generic exception handler for any unhandled exception in our application.
+- `public final ResponseEntity<ErrorDetails> handleAllException(Exception ex, WebRequest request)`: This method takes an exception (`Exception` class) and a `WebRequest` as parameters. It creates an `ErrorDetails` object containing the current timestamp, the exception message, and a description of the request.
+- `@ExceptionHandler(UserNotFoundException.class)`:
+  This annotation on the `handleUserNotFoundException` method specifically handles exceptions of type `UserNotFoundException`. This allows for more specific handling for this particular exception.
+
+## Validations for Rest API
+
+### JSR-303 Bean Validation(Annotations):
+
+Spring supports the Bean Validation standard through annotations. We can annotate our model classes with validation constraints.
+
+```java
+public class UserDTO {
+    @NotBlank
+    @Size(min = 5, max = 50)
+    private String username;
+
+    @Email
+    private String email;
+
+    // Other fields and methods
+}
+```
+
+In this example, `@NotBlank` ensures that the `username` is not empty, and `@Email` ensures that the `email` is a valid email address.
+
+## REST API Documentation
+
+In Spring Boot, we can use Swagger for documenting our RESTFUL APIs. Swagger provides a set of tools for generating API documentation from our Spring-based application. Starting our Spring Application. Swagger UI should now be accessible at `http://localhost:8080/swagger-ui/index.html`. We can explore our API documentation, test endpoints, and see example requests and responses.
