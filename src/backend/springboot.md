@@ -358,3 +358,35 @@ Spring Boot DevTools is a set of tools that makes the process of developing Spri
             <optional>true</optional>
         </dependency>
 ```
+
+## Cross Origin Resource Sharing
+
+It is a security feature implemented by web browsers to control how web pages in one domain can request and interact with resources from another domain. For example, `http://localhost:3000` is a different origin from `http://localhost:8080`
+
+### Enable cross-origin requests in Spring Boot
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedMethods("*")
+                        .allowedOrigins("http://localhost:3000");
+            }
+        };
+    }
+}
+
+```
+
+The provided `WebMvcConfigurer` bean for CORS configuration in a Spring Boot allows cross-origin requests from `http://localhost:3000` and permits all HTTP methods for all paths.
