@@ -6,10 +6,9 @@ category:
 tag:
   - Microsoft
   - Transact-SQL
-
-star: true
-sticky: true
 ---
+
+# Transact-SQL
 
 ## What is database?
 
@@ -251,7 +250,7 @@ OVER ( PARTITION BY column
 
 - **PARTITION BY column**: this divides the result set into paritions to which the window function is applied. If not specified, the function treats all rows of the query result set a single group.
 - **ORDER BY**: This orders the rows within each partition. If not specified, the function treats all rows of the partitionn as a single group.
-  -- **ROWS|RANGE <frame specification>:** This specifies the set of rows included in the window frame. (e.g. `ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING` means the window frame for each row will include the current row, the row immediately before the current row, the row immediately after the current row.)
+  -- **ROWS|RANGE:** This specifies the set of rows included in the window frame. (e.g. `ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING` means the window frame for each row will include the current row, the row immediately before the current row, the row immediately after the current row.)
 
 ### ROW_NUMBER():
 
