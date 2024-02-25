@@ -15,8 +15,8 @@ tag:
 - The common type system defines how types are declared, used, and managed in the runtime.
 - Establishes a framework that enables cross-language integration, type safety, and high performance code.
 - The common type system supports two types:
-  - 1. Value Types
-  - 2. Reference Types
+  - 1. Value Types (`bool`, `char`, `enum`, `struct`, `DateTime`)
+  - 2. Reference Types (classes, arrays, delegates, interfaces)
 
 ### Value types vs. Reference type
 
@@ -25,6 +25,30 @@ tag:
 3. Value types will not be collected by garbage collector; reference types will be collected by garbage collector.
 4. Value types can be created by struct or enum while reference type can be created by class, interface, delegate or array.
 5. Value types can not accept any null values while reference types can accept null values.
+
+## How to differentiate value types and reference types:
+
+- **Value types**: When we assign a value type variable to another value type variable, a copy of the value is made. If we change one variable, it doesn't affect the other. Value types are stored in the stack.
+
+```csharp
+int x = 10;
+int y = x;
+y = 20;
+Console.WriteLine(x);  // Outputs: 10
+Console.WriteLine(y);  // Outputs: 20
+```
+
+- **Reference types**: When we assign a reference type variable to another reference type variable, they both refer to the same object. If we change one variable, it affects the other. Reference types are stored in the heap.
+
+```csharp
+var x = new StringBuilder("Hello");
+var y = x;
+y.Append(" World");
+Console.WriteLine(x);  // Outputs: Hello World
+Console.WriteLine(y);  // Outputs: Hello World
+```
+
+**Note that `string` is a special case. Even though it is a reference type, it behaves like a value type because it's immutable. When we change a string, we are actually creating a new string, so it doesn't affect other strings that were assigned the same value.**
 
 ## Primitive data types in C#:
 
@@ -306,7 +330,7 @@ Namespaces in C# serve a similar purpose to packages in Java. Both are used to o
 
 ## Boxing and Unboxing in C#
 
-1. **Boxing** is the process of converting a value type (like `int`, `bool`, `char`, etc.) to the type `object` or to any interface type implemented by this value type. When the CLR boxes a value type, it wraps the value inside a `System.Object` and stores it on the managed heap.
+1. **Boxing** is the process of converting a value type (like `int`, `bool`, `char`, etc.) to the `object` type or to any interface type implemented by this value type. When the CLR boxes a value type, it wraps the value inside a `System.Object` and stores it on the managed heap. Boxing is implicit.
 
 ```csharp
 int i = 10;
@@ -315,13 +339,24 @@ object o = i; // boxing
 
 In this example, the value of `i` is boxed and assigned to `o`.
 
-2. **Unboxing** is the process of converting the object type back to the value type.
+### Boxing process:
+
+- The CLR allocates a new object of type `object` on the heap.
+- The CLR copies the value of the value type into the new object.
+- The CLR returns a reference to the new object.
+
+2. **Unboxing** is the process of converting the object/reference type back to the value type. Unboxing extract the value from the reference type and assign it to a value type.
 
 ```csharp
-int j = (int) 0; // unboxing
+object o = 10;
+int i = (int)o; // performs unboxing.
 ```
 
-In this example, the boxed value in `o` is unboxed and assigned to `j`.
+## What is the point of boxing and unboxing in C#?
+
+1. **storing value types in Collections**: Before generics were introduced in .NET 2.0, collections could only store objects. If we wanted to store a value type in a collection, we had to box it. Even now, there are some older APIs and collections that require objects.
+
+2. **Method Calls**: If we want to call a method that requires an object parameter, and all we have is a value type, we would need to box the value type.
 
 ## Default parameter in C#
 
@@ -352,3 +387,21 @@ public void OldMethod()
 ```
 
 The `Obsolete` attribute is useful for managing changes to our codebase over time, especially when we are managing a library that is used by other people. It allows us to communicate that certain parts of our code are outdated and suggest alternatives, without immediately breaking any code that uses those parts.
+
+## Anonymous Type:
+
+In C#, an anonymous type is a type without any name that encapsulate public read-only properties only. It cannot contain other members such as fields, methods, events, etc.
+
+### Creating an anonymous type:
+
+```csharp
+var student = new {Id = 1, FirstName = "James", LastName = "Bond"};
+```
+
+The example above demonstrates creating an anonymous type variable `student` that contains three properties named `Id`, `FirstName`, `LastName`.
+
+### Points to remember:
+
+- The properties of anonymous types are read-only and cannot be initialized with a null, anonymous function, or a pointer type.
+- The properties can be accessed using dot(.) notation, same as object properties.
+- We cannot change the values of properties as they are read-only.
