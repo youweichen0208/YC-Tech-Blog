@@ -405,3 +405,45 @@ The example above demonstrates creating an anonymous type variable `student` tha
 - The properties of anonymous types are read-only and cannot be initialized with a null, anonymous function, or a pointer type.
 - The properties can be accessed using dot(.) notation, same as object properties.
 - We cannot change the values of properties as they are read-only.
+
+## Array vs. ArrayList
+
+- Use Arrays when:
+  - we need a fixed-size collection
+  - we want type safety
+  - we require better performance
+- Use ArrayLists When:
+  - We need a dynamically resizable collection.
+  - We want to store elements of different data types
+  - Not type safe.
+
+## Non-Generic Collections vs. Generic Collections:
+
+### Non-Generic Collections:
+
+Non-generic collections are part of the older collection classes in C# and work with objects of type `object`. They lack type safety because they allwo storing elements of any data type.
+
+```csharp
+ArrayList list = new ArrayList();
+list.Add(10);         // Adding an integer
+list.Add("Hello");    // Adding a string
+
+```
+
+- **Not Type-Safe**:
+  - Non-generic collections can store elements of any data type, but this lack of type safety can lead to runtime errors if elements are not cast properly.
+- **Boxing and Unboxing**:
+  - When storing value types in a non-generic collection, boxing and unboxing operations are required, leading to performance overhead
+
+### Generic Collections:
+
+```csharp
+List<int> numbers = new List<int>();
+numbers.Add(10);       // Adding an integer
+// numbers.Add("Hello"); // Error: Cannot add a string to a List<int>
+```
+
+- **Type-Safe**:
+  - Generic collections are type-safe, meaning they only allow elements of a specific data type.
+- **No Boxing and Unboxing**:
+  - Generic collections avoid the need for boxing and unboxing, resulting in better performance when working with value types.

@@ -401,3 +401,165 @@ int singleNumber = numbers.Single(n => n == 3);  // singleNumber will be 3
 
 It will return the matched single record, but if no matching record found, then it will assign a default value. And if there is more than
 one matching record got found, it will throw an exception.
+
+## How to implement pagination in LINQ:
+
+In LINQ, we can implement pagination using the `Skip()` and `Take()` methods.
+
+```csharp
+using System;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        // Sample data source (you can replace this with your actual data source)
+        var data = Enumerable.Range(1, 100); // Represents a collection of 100 elements
+
+        // Pagination parameters
+        int pageNumber = 2; // The page number you want to retrieve
+        int pageSize = 10; // The number of items per page
+
+        // Calculate the number of items to skip based on the page number and page size
+        int itemsToSkip = (pageNumber - 1) * pageSize;
+
+        // Use Skip() and Take() for pagination
+        var pageOfData = data.Skip(itemsToSkip).Take(pageSize);
+
+        // Display the results
+        Console.WriteLine($"Page {pageNumber} of data:");
+        foreach (var item in pageOfData)
+        {
+            Console.WriteLine(item);
+        }
+    }
+}
+```
+
+- `Skip(itemsToSkip)` is used to skip the specified number of elements(items to skip), which is calculated based on the page number and page size.
+- `Take(pageSize)` is used to take the specified number of elements(page size) from the skipped position.
+
+## IEnumerable vs. IQueryable
+
+### IEnumerable
+
+`IEnumerable` is the most basic interface for iterating over a collection of objects. It is part of the System.Collections namespace. Operations on `IEnumerable` are performed in-memory, meaning that data is loaded into memory before any operations are executed. Suitable for in-memory collections such as arrays, lists, or collections where data is already in memory.
+
+### IQueryable
+
+`IQueryable` is part of the System.Linq namespace. Operations on `IQueryable` are typically not executed immediatley. They are deferred until the data is actually needed. Suitable for querying remote data sources or databases where queries can be translated into optimized queries for underlying data store.
+
+### Key Differences:
+
+1. `IEnumerable` executes queries in-memory, while `IQueryable` allows for deferred execution and query translation.
+2. Use `IEnumerable` for in-memory collections or scenarios where data is already in memory. Use `IQueryable` when querying external data sources or databases.
+
+## Extension Methods:
+
+Extension methods are a feature in C# that allows us to add new methods to existing types without modifying them. Extension methods are defined as static methods in static classes, and they are called in a way that looks like instance methods of the extended type.
+
+### Examples of Built-in Extention Methods:
+
+1. LINQ Methods:
+
+- LINQ provides numerous extension methods for querying collections.
+
+```csharp
+// Example: Where is an extension method on IEnumerable<T>
+var filteredList = myList.Where(item => item > 5);
+```
+
+2. String Methods:
+
+- The `string` class has several extension methods for common
+
+```csharp
+// Example: ToUpper is an extension method on string
+string upperCaseString = myString.ToUpper();
+
+```
+
+## Creating Custom Extension Methods:
+
+1. Create a Static class
+2. Define the static Extension Method. The first parameter of the method specifies the type being extended, MUST BE preceded by `this` keyword.
+
+```csharp
+public static class MyExtensions
+{
+    public static string Reverse(this string input)
+    {
+        char[] charArray = input.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
+    }
+}
+
+```
+
+## Exception:
+
+An exception is an abnormal event or error condition that occurs during the execution of a program. The `Exception` class is the base class for all the built-in exception class in .NET framework.
+
+### Exception Handling in C#:
+
+C# provides built-in support to handle the exception using `try`, `catch`, & `finally` blocks.
+
+```csharp
+try {
+    //
+}
+catch {
+
+}
+finally {
+
+}
+```
+
+- **try block**: Any suspected code that may raise exceptions should be put inside a `try{ }` block. If an exception occurs, the flow of the control jumps to the first matching `catch` block
+
+- **catch block**: The `catch` block is an exception handler block where we can perform some action such as logging and auditing an exception.
+
+- **finally block**: The `finally` block is an optional block and should come after a `try` or catch block. The `finally` block will always be executed whether or not an exception occurred. **The finally block generally used for cleaning-up code e.g., disposing of unmanaged objects.**
+
+### Throwing Exceptions:
+
+We can manually throw exceptions using the `throw` keyword
+
+```csharp
+public int Divide(int numerator, int denominator)
+{
+    if (denominator == 0)
+    {
+        throw new DivideByZeroException("Denominator cannot be zero.");
+    }
+    return numerator / denominator;
+}
+
+```
+
+### Custom Exceptions:
+
+We can create our own custom exception classes by inheriting from the `Exception` class.
+
+```csharp
+public class CustomException : Exception
+{
+    public CustomException(string message) : base(message)
+    {
+    }
+}
+
+// Usage
+try
+{
+    throw new CustomException("This is a custom exception.");
+}
+catch (CustomException ex)
+{
+    Console.WriteLine(ex.Message);
+}
+
+```

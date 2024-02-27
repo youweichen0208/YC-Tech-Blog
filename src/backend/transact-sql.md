@@ -67,12 +67,6 @@ In SQL Server, system databases are a set of databases that are creatd and maint
 
 A subquery is a SELECT query that is nested within another SELECT, INSERT, UPDATE, or DELETE statement. A subquery can also be nested inside another subquery.
 
-### Use Cases:
-
-1. When we need to use an already prefiltered table's result set in another query.
-2. Increase performance using a prefiltered table
-3. Increase readability
-
 ## The difference between Subquery and Join:
 
 - **Purpose**:
@@ -228,7 +222,7 @@ FROM cte_name;
 
 - **Lifetime**: A CTE is a temporary result set that exists only within the scope of a single statement. Once the statement has been executed, the CTE is discarded. On the other hand, a View is a database object that is stored on the server and can be used across multiple statements and sessions, just like a regular table.
 
--- **Modification**: We can't directly modify data through a CTE. Any INSERT, UPDATE, or DELETE operations would need to be performed on the underlying tables. In contrast, with Views, we can perfor, modifications directly
+-- **Modification**: We can't directly modify data through a CTE. Any INSERT, UPDATE, or DELETE operations would need to be performed on the underlying tables. In contrast, with Views, we can perform modifications directly
 
 -- **Recursion**: CTEs support recursive queries, which can be used to perform complex tasks like hierarchical or tree-based data traversal. Views do not support recursion.
 
@@ -329,7 +323,7 @@ Jae        Pak                  United Kingdom       4116871.22    1
 
 ### RANK:
 
-RANK() returns the rank of each row within the partition of a result set. The rank of a row is one plus the number of ranks that come before the row in question.
+RANK() returns the rank of each row within the partition of a result set. The rank of a row is one plus the number of ranks that come before the row in partition.
 
 ROW_NUMBER and RANK are similar. ROW_NUMBER numbers all rows sequentially (for example, 1, 2, 3, 4, 5). RANK provides the same numeric value for ties (for example, 1, 2, 2, 4, 5).
 
@@ -467,7 +461,7 @@ Special type of table so that we can store data temporarily
 ### Local Temporary Variable:
 
 - Local temporary tables are only visible to the current session and are automatically dropped when the session ends.
-- The table name starts with a single pound sign (#)
+- The table name starts with a single hash tag (#)
 
 ```sql
 CREATE TABLE #TempTable (
@@ -476,10 +470,26 @@ CREATE TABLE #TempTable (
 )
 ```
 
+### What is the difference between Local Temporary Tables and CTE?
+
+- **Scope and Lifetime**:
+
+  - A Local Temporary Table is visible only in the current session, and it is dropped automatically when the session ends or the connection is closed.
+  - A CTE is only visible within the query that defines it, and it's discarded after the query is executed.
+
+- **Storage**:
+
+  - A Local Temporary Table is stored in tempdb and can have indexes, keys, constraints, defaults, and even triggers.
+  - A CTE is not stored in tempdb and does not have a physical presence in the database.
+
+- **Modification**:
+  - We can perform DML operations (INSERT, UPDATE, DELETE) on a Local Temporary Table
+  - A CTE is read-only and cannot be used to directly modify data.
+
 ### Global Temporary Tables:
 
 - Global temporary tables are visible to all sessions and are dropped when the last session using the table is closed.
-- The table name starts with a double pound sign (##).
+- The table name starts with a double hash tags(##).
 
 ```sql
 CREATE TABLE ##TempTable (
@@ -513,7 +523,7 @@ INSERT INTO @TableName values (value1, value2, ...), (value1, value2,...)
 
 1. **Storage**: both Temp Tables and Table Variables are stored in tempDb
 2. **Scope**: Temp Tables scoped local/global; Table Variables scoped for current batch
-3. Temp Tables for large data; Table Variables for smaller dara.
+3. Temp Tables for large data; Table Variables for smaller data.
 4. **Usage**: Temp Tables not in Stored Procedure, Functions; Table Variables can be used.
 5. **Structure**: We can perform DDL operations like `CREATE INDEX` on temporary tables. This is not possible with table variables.
 
@@ -623,11 +633,11 @@ The `--` in SQL is a comment marker, so everything after it is ignored. This mea
 
 ## User-Defined Functions (UDFs)
 
-In SQL Server, User-Defined Functions (UDFs) are custom functions created by users to encapsulate a specific piece of logic that can be reused in SQL queries. There are two main types of User-Defined Functions in SQL Server: Scalar Functions and Table-Valued Functions.
+In SQL Server, a User-Defined Function (UDF) is a precompiled and reusable set of Transact-SQL statements that can be used to encapsulate business logic or perform speciic tasks. UDF enhance code modularity, reusability, and maintainability in SQL server.
 
 ### 1. Scalar Functions:
 
-A Scalar Function returns a single valuer and can be used in SQL statements whenever an expression can be used.
+A Scalar Function returns a single value and can be used in SQL statements whenever an expression can be used.
 
 ```sql
 -- Creating a Scalar UDF
@@ -657,50 +667,30 @@ SELECT dbo.AddTwoNumbers(5, 7) AS SumResult;
 
 A Table-Valued Function returns a table result set. There are two types of Table-Valued Functions: Inline Table-Valued Functions and Multi-Statement Table-Valued Functions.
 
-#### Inline Table-Valued Function:
-
-An Inline Table-Valued Function returns a table using a single SELECT statement.
-
 ```sql
--- Creating an Inline Table-Valued Function
+-- Step 1: Create the Table-Valued UDF
 CREATE FUNCTION dbo.GetEmployeesByDepartment
 (
-    @departmentId INT
+    @deptID INT
 )
 RETURNS TABLE
 AS
 RETURN
 (
-    SELECT * FROM Employees WHERE DepartmentID = @departmentId
+    SELECT EmployeeID, FirstName, LastName
+    FROM Employees
+    WHERE DepartmentID = @deptID
 );
 ```
 
-Usage of the Inline Table-Valued Function in a query:
+Call the Table-Valued UDF:
 
 ```sql
--- Using the Inline Table-Valued Function
-SELECT * FROM dbo.GetEmployeesByDepartment(2);
+-- Step 2: Call the Table-Valued UDF
+DECLARE @departmentID INT = 1;
 
-```
-
-#### Multi-Statement Table-Valued Function:
-
-A Multi-Statement Table-Valued Function uses a BEGIN...END block to define the table variable and populate it.
-
-```sql
--- Creating a Multi-Statement Table-Valued Function
-CREATE FUNCTION GetCustomerOrderSummary (@CustomerId INT)
-RETURNS @OrderSummaryTable TABLE (OrderId INT, TotalAmount DECIMAL(10,2))
-AS
-BEGIN
-    INSERT INTO @OrderSummaryTable
-    SELECT OrderId, SUM(UnitPrice * Quantity)
-    FROM Orders JOIN OrderDetails ON Orders.OrderId = OrderDetails.OrderId
-    WHERE CustomerId = @CustomerId
-    GROUP BY OrderId;
-
-    RETURN;
-END;
+-- Call the UDF in a SELECT statement
+SELECT * FROM dbo.GetEmployeesByDepartment(@departmentID);
 ```
 
 ## What is the difference between stored procedure (sp) and user-defined function (udf)?
@@ -739,6 +729,8 @@ The `OFFSET` clause skips the specified number of rows, and the `FETCH NEXT` cla
 ## Normalization:
 
 Normalization is the process of organizing and structuring a relational database to reduce data redundancy and improve data integrity. The normalization process involves breaking down large tables into smaller, related tables and defining relationships between them.
+
+- First Normal Form: Each table cell should contain a single value, and each record needs to be unique.
 
 ## One-to-many relationships
 
@@ -810,7 +802,7 @@ Constraints in SQL server are rules enforced on data columns on a table. They ar
 
 - **PRIMARY KEY**: Uniquely identifies each record in a database table. Primary keys must contain unique values and cannot be null.
 
-- **FOREIGN KEY**: Uniquely identifies a row/record in any of the given database table. It is used to precent actions that would destroy links between tables.
+- **FOREIGN KEY**: a constraint that is used to establish a link between the data in two tables. It enforces referential integrity by ensuring that the values in a column of one table match the values in another table's primary key or unique constraint.
 
 - **UNIQUE**: Ensures that all values in a column are different.
 
@@ -1046,3 +1038,80 @@ CREATE TABLE EmployeeProject (
 A candidate key is a column, or a set of columns, in a table that can uniquely identify a row within a table. Each table must have at least one candidate key. It's called a `candidate key` because it's a candidate for becoming the primary key of the table.
 
 For example, in a table with columns `EmployeeID`, `Email`, and `PhoneNumber`, any of these could be a candidate key if they are unique across all rows. The primary key would then be chosen from these candidate keys based on the specific requirements of the database design.
+
+## Dynamic SQL in SQL Server
+
+Dynamic SQL allows us to construct SQL statements as strings and execute them at runtime.
+
+### Use cases for dynamic SQL
+
+- Dynamic SQL is useful when:
+  - Query structure depends on user input
+  - the number or names of columns or tables are not known at compile time.
+  - we need to dynamically construct complex queries.
+
+### Basic Syntax for Dynamic SQL:
+
+- Use the `EXEC` statement to execute dynamically constructed SQL strings
+
+```sql
+DECLARE @Student_id NVARCHAR(50)
+SET @Student_id = '8'
+
+DECLARE @SQL NVARCHAR(50)
+SET @SQL = 'SELECT * FROM Student WHERE Id = ' + @Student_id
+
+EXEC sp_executesql @SQL
+```
+
+## Table Scan vs Index Scan
+
+### Table Scan:
+
+A table scan involves scanning the entire table to retrieve the required rows.
+
+### Index Scan:
+
+An index scan involves scanning the index struture to locate the rows that meet the query conditions.
+
+### Key Differences between Index Scan and Table Scan:
+
+1. **Data Retrieval**:
+
+- In a table scan, all rows are read directly from the table.
+- In an index scan, only the rows that satisfy the query conditions are retrieved from the table.
+
+2. **Suitability**:
+
+- Table scans are used when no suitable index is available or when it's more efficient to read the entire table.
+- Index scans are used when there is a suitable index for the query conditions.
+
+3. **Efficiency**:
+
+- Table scans can be efficient for small tables but become inefficient for large tables.
+- Index scans are generally more efficient for selective queries that involve small portion of the table.
+
+4. **Resource Usage**:
+
+- Table scans may lead to higher resource usage, especially for large tables
+- Index scans can reduce resource usage by accessing only the necessary rows.
+
+## Deadlock:
+
+A deadlock in SQL Server occurs when two or more processes are blocked, each waiting for the other to release a resource, leading to a situation where no progress can be made.
+
+### Example:
+
+- Transaction A acquires a lock on Resource 1 and needs access to Resource 2
+- Transaction B acquires a lock on Resource 2 and needs access to Resource 1.
+
+### How to prevent deadlocks:
+
+- Reducing transaction time
+- Adjusting the Isolation levels
+
+## What is the difference between left join and inner join?
+
+- Inner join includes rows with matching values in both tables. Left Join includes all rows from the left table and the matched rows from the right table. Unmatched rows in the right table will result in NULL values.
+- Inner join produces a result set containing only matched rows. Left Join produces a result set containing all rows from the left table, with matched rows from the right table and NULL values for unmatched rows.
+- Inner join is used when we want to retrieve all rows from the left table, regardless of whether there are matches in the right table.
