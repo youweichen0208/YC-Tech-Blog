@@ -40,7 +40,7 @@ Abstaction can be achieved in two ways: 1. **Abstract class** 2. **Interfaces**
 
 ## Encapsulation
 
-Encapsulation hides the data and implementation details show only the required members within a class, thus hiding complexity from other code. No other code needs to know about implementation detail and also can't modify the code of the class' data and methods.
+Encapsulation refers to the bundling of data (attributes or properties) and methods (functions or procedures) that operate on the data into a single unit known as a class.
 
 ### key concepts related to encapsulation:
 
