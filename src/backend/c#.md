@@ -215,7 +215,7 @@ ChangeValue(ref a);
 Console.WriteLine(a); // Outputs: 10
 ```
 
-### The difference between **ref** and _\*\*out_:
+### The difference between **ref** and **out**:
 
 - **ref**: when we pass a parameter using the `ref` keyword, the variable must be initialized before it's passed. The method can then read from and write to that variable.
 
@@ -270,20 +270,7 @@ public enum Days : byte
 {
     Sunday = 1,
     Monday = 2,
-    Tuesday = 3,public class MyGenericClass<T>
-{
-    private T genericMember;
-
-    public MyGenericClass(T value)
-    {
-        genericMember = value;
-    }
-
-    public T GetMember()
-    {
-        return genericMember;
-    }
-}
+    Tuesday = 3,
     Wednesday = 4,
     Thursday = 5,
     Friday = 6,
@@ -447,3 +434,7 @@ numbers.Add(10);       // Adding an integer
   - Generic collections are type-safe, meaning they only allow elements of a specific data type.
 - **No Boxing and Unboxing**:
   - Generic collections avoid the need for boxing and unboxing, resulting in better performance when working with value types.
+
+## Explain the concept of "generics" in C#?
+
+Generics is a feature in C# that allows the creation of classes, interfaces, and methods that can work with any data type. This allows for a more flexible and reusable code.
