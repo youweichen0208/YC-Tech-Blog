@@ -339,3 +339,23 @@ console.log(jsonString); // Outputs: '{"name":"John","age":30,"city":"New York"}
 ### Why we need JSON.stringify()?
 
 In JavaScript, when we use an object(including arrays) as a key in another object, the key is not the actual object, but a reference to that object. That means two identical-looking objects or arrays are not considered the same key, because they are different instances and thus have different references.
+
+## Cookies, LocalStorage, Session Storage
+
+### Cookies:
+
+- Cookies are small pieces of data stored by the browswer and sent to the server with every HTTP request.
+- Cookies have a storage limit size up to 4KB
+- Cookies can be set to persist for a specified duration or persist until the user closes the browser.
+- Cookies can be made secure by setting the Secure and HttpOnly flags, which prevent them from being sent over encrypted connections or accessed via JavaScript.
+
+### LocalStorage:
+
+- LocalStorage is a way to store data on the client's computer. It allows the storage of larger amounts of data.
+- The data in localstorage persists indefinitely, until explicitly deleted by the user or the web application.
+- Unlike Cookies, localstorahe data is never sent to the server
+
+### SessionStorage:
+
+- Session Storage is similar to localStorage, but it has a shorter lifespan. Data in sessionStorage is cleared when the page session ends (when the browser tab is closed).
+- Like localStorage, sessionStorage can store larger amounts of data (up to 5MB or more), and the data is never sent to the server.
