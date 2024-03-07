@@ -70,7 +70,7 @@ HTML stands for HyperText Markup Language. It's the standard markup language for
 
 - `<span>...</span>` is a inline tag.
 - It is used to format small chunks of data within another element.
-- Combining <span> tag with CSS allow us to create custom tags.
+- Combining `<span>` tag with CSS allow us to create custom tags.
 
 ```html
 <p>
