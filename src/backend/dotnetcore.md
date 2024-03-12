@@ -582,3 +582,81 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
 - `public BaseRepository(ShippingDbContext context){  _shippingDbContext = context}`: This is the constructor for the `BaseRepositpory<T>` class. It takes a `ShippingDbContext` as a parameter and assigns it to the `_shippingDbContext` field. The reason for doing this is to use depenedency injection to create the instance of ShippingDbContext.
 
 - `public int Add(T entity) {...}`: This is the implementation of the `Add` method from the `IBaseRepository<T>` interface. It adds the given entity to the `DbSet<T>` for that entity type in the `ShippingDbContext`, and then calls `SaveChanges` to save the changes to the database.
+
+## Fluent API
+
+Fluent API is a way of designing APIs in a more readable and expressive manner, often used in .NET Core for configuring and building complex objects. In Entity Framework Core, Fluent API is commonly used for configuring database models.
+
+### Fluent API vs Annotations:
+
+1. Fluent API provides a more readable and expressive way of configuring entity models; Annotations are often more concise and preferable for simple configurations.
+2. Fluent API allows us to centralize configuration logic in the `OnModelCreating` method of our `DbContext`, promoting a sepration of concerns.
+3. Fluent API provides more flexibility for advanced configurations that might now be achivable with annotations alone. It allows us to handle complex relationships, indexes, and other aspects of database modeling.
+
+### OnModelCreating
+
+`OnModelCreating` is a method that is part of the `DbContext` class in Entity Framework Core. It is called when the model for a derived context has been initialized. The primary purpose of `OnModelCreating` is to configure the database model. This includes defining entities, specifying keys, configuring relationships, and setting up various aspects of how the entities map to the database schema.
+
+### ModelBuilder
+
+`ModelBuilder` is a class provided by Entity Framework Core within the `OnModelCreating` method. It represents the entry point for configuring the database model. We use it to define the mapping between our domain classes (entities) and the database tables, columns, and relationships.
+
+- **Entity Configuration:**
+  - Configuring various aspects of our entites, such as setting primary keys, defining column types, specifying required properties, etc.
+- **Relationship Configuration:**
+  - Configuration relationships between entites, including one-to-one, one-to-many, and many-to-many relationships. This is often done using Fluent API.
+- **Table and Column Naming:**
+  - Customizing the names of tables and columns in the database to match our application's conventions or requirements.
+- **Index and Key Configuration**:
+  - Defining indexes and unique constraints on columns.
+
+### One to many relationships in Fluent API:
+
+Assume we have the following classes:
+
+```csharp
+public class Author
+{
+    public int AuthorId { get; set; }
+    public string Name { get; set; }
+
+    // Navigation property for the one-to-many relationship
+    public ICollection<Book> Books { get; set; }
+}
+
+public class Book
+{
+    public int BookId { get; set; }
+    public string Title { get; set; }
+    public int AuthorId { get; set; }
+
+    // Navigation property for the many-to-one relationship
+    public Author Author { get; set; }
+}
+
+```
+
+Let's configure one-to-many relationship using Fluent API in our `OnModelCreating` method:
+
+```csharp
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    // Configure the one-to-many relationship between Author and Book
+    modelBuilder.Entity<Author>()
+        .HasKey(a => a.AuthorId);
+
+    modelBuilder.Entity<Book>()
+        .HasKey(b => b.BookId)
+        .Property(b => b.Title)
+        .IsRequired();
+
+    // Define the one-to-many relationship
+    modelBuilder.Entity<Author>()
+        .HasMany(a => a.Books)        // One Author has many Books
+        .WithOne(b => b.Author)       // Each Book has one Author
+        .HasForeignKey(b => b.AuthorId); // Foreign key on the Book table
+}
+
+```
+
+- `.Property()` method in Entity Framework Core's Fluent API is used to configure the properties of an entity.
