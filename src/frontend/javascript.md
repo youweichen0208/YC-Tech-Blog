@@ -359,3 +359,5 @@ In JavaScript, when we use an object(including arrays) as a key in another objec
 
 - Session Storage is similar to localStorage, but it has a shorter lifespan. Data in sessionStorage is cleared when the page session ends (when the browser tab is closed).
 - Like localStorage, sessionStorage can store larger amounts of data (up to 5MB or more), and the data is never sent to the server.
+
+

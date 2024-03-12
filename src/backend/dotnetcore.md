@@ -346,3 +346,146 @@ The **asp-route** specifies route values for the link. It allows us to pass para
 ```
 
 In this example, the link points to the "Details" action in the `Home` controller and passes a route value with the key "id" and value "123".
+
+## Hot Reload
+
+The `dotnet watch run` command is a tool in .NET Core that automatically rebuilds and reruns our application whenever it detects changes in the source code. This is often referred to as "hot reloading".
+
+## HttpContext
+
+The HttpContext object encapsulates all the HTTP-specific information about a single HTTP request. When an HTTP request arrives at the server, the server processes the request and builds an HttpContext object. This object represents the request and its content which our application code can use to create the response. Some.
+
+Here are some of its important properties:
+
+- `Request`: This property is of type `HttpRequest` and provides information about the HTTP request including headers, query strings, and body.
+- `Response`: This property is of type `HttpResponse` and allows us to control the HTTP response sent back to the client, including setting headers, status code, and writing to the response body.
+
+- `User`: This property is used for authentication and authorization.
+
+-- `Session`: This property provides a way to store data and is associated with a specific user across multuple requests.
+
+-- `Items`: This property is a key-value conenction that can be used to store data while processing a single request.
+
+**Remember that `HttpContext` is specific to a single request and response pair, so it is NOT shared across different HTTP requests.**
+
+## N-Layer architecture:
+
+As applications grow in complexity, one way to manage that complexity is to break up the application according to its responsibilities and concerns. This approach follows the separation of concerns principle and can help keep a growing database organized so that developers can easily find where certain functionality is implemented.
+
+- Presentation Layer:
+
+This is the user interface layer. It could be a web page, desktop application, or a mobile app. It is responsible for displaying data to the user and handling user input.
+
+- Business Logic Layer (Service Layer):
+
+This layer contains the core business logic of the application. It coordinates the application's response to user input and drives the business process of the application.
+
+- Data Access Layer:
+
+This layer is responsible for communicating with the database or any other storage system. It might contain code for querying database, mapping the results to objects, and saving objects back to the database.
+
+### Disadvantage of N-Layer approach:
+
+The compile-time dependencies run from the top to the bottom. The User Interface layer depend on the Business Logic Layer. Business Logic Layer depends on the Data Access Layer. In a traditional N-Layer architecture without the use of interfaces or dependency inversion, the Business Logic Layer (BLL) would directly instantiate and use classes from the Data Access Layer. This means that the Business Logic Layer (which holds the most important logic in the application) is dependent on data access implementation details (and often on the existence of a database). Testing business logic in such an architecture is often difficult, requiring a test database.
+
+## Clean Architecture
+
+Clean architecture puts the business logic and application model at the center of the application. Instead of having business logic depend on data acess or other infrastructure concerns, this dependency is inverted: insfrastructure and implementation details depend on the Application Core. This functionality is achieved by defining abstractions, or interfaces.
+
+### Organizing code in Clean Architecture:
+
+In a Clean Architecture solution, each project has clear responsibilities. As such, certain types **belong in each project**.
+
+### Application Core
+
+The Application Core holds the business model, which includes entities, services, and interfaces.
+
+- Entities (business model classes that are persisted)
+- Interfaces (For Respositories and Services)
+- Domain Services
+- Custom Exceptions and Guard Clauses
+
+### Insfrastructure:
+
+The Infrastructure project typically includes data access implementations. In a typical ASP.NET Core web application, these implementations include the Entity Framework (EF) DbContext, any EF Core Migration objects that have been defined, and data access implementation classes. The most common way to abtract data access implementation code is through the use of the Repository design pattern.
+
+In addition to data access implementations, the Infrastructure project should contain implementations of services that must interact with infrastructure concerns. These services should implement interfaces defined in the Application Core, and so infrastructure should have a reference to the Application Core project.
+
+- EF Core types (DbContext, Migration)
+- Data access implementation types (Respositories)
+- Infrastructure-specific services.
+
+### UI/API Layer:
+
+The uer interface layer in an ASP.NET Core MVC application is the entry point for the application. This project should reference the Application Core project, and its types should interact with infrastructure strictly through interfaces defined in Application Core. No direct instantiation of or static calls to the infrastructure layer types should be allowed in the UI layer.
+
+- Controllers
+- Custom Filters
+- Custom Middleware
+- Views, Partial Views & View Components
+- Startup/Program.cs
+
+## DB Context:
+
+`DbContext` is a fundamental class in Entity Framework, which is an Object-Relational Mapping (ORM) developed by Microsoft for .NET applications. The `DbContext` class represents a session with the database and provides a set of APIs for performing database operations, such as querying, inserting, updating, and deleting records. It acts as the bridge between our model and the relational database.
+
+### DbSet:
+
+In Entity Framework, `DbSet` is a class provided by the framework that represents a collection of entities in the context of a database.
+
+1. Entity Representation:
+
+- Each `DbSet` property in a class derived from `DbContext` represents a table or view in the underlying database.
+- For example, if we have a `DbSet<User>` property, it typically corresponds to a table named `Users` in the database.
+
+2. CRUD Operations:
+
+- `DbSet` provides methods for performing common database operations such as querying, inserting, updating, and deleting entities.
+
+- For example, we can use methods like `Add`, `Remove`, `Find`, and LINQ queries to interact with the entities in the set.
+
+3. LINQ Queries:
+
+- We can use LINQ to query entities in a `DbSet`. This allows us to write expressive and type-safe queries against our database.
+
+### DbContext class constructor
+
+the constructor that accepts `DbContextOptions<YourDbContext>` is required for our `DbContext` class. This constructor is necessary for Entity Framework to configure the database connection and other options for our application.
+
+```csharp
+public class TrainingDbContext:DbContext
+{
+    public TrainingDbContext(DbContextOptions<TrainingDbContext> options) : base(options)
+    {
+
+    }
+
+    public DbSet<Employee> Employees { get; set; }
+
+    public DbSet<Department> Departments { get; set; }
+}
+```
+
+### Necessary dependencies to use Entity Framework Core application:
+
+- **Microsoft.EntityFrameworkCore**:
+  This is the core Entity Framework package that provides the fundamental functionality working with databases.
+- **Microsoft.EntityFrameworkCore.SqlServer**:
+  If we are using SQL Server as our database provider, we'll need this package. It includes the necessary components to interact with SQL Server databases using Entity Framework Core.
+
+- **Microsoft.EntityFrameworkCore.Tools**:
+  This package includes additional tools for working with Entity Framework Core, especially during development. It can be useful for generating entity classes and a `DbContext` based on an existing database.
+
+- **Microsoft.EntityFrameworkCore.Design**:
+  This package contains the design-time components for Entity Framework Core. It's needed for migrations and other design-time operations during development
+
+## Migrations in the DbContext
+
+In Entity Framework Core, a migration is a way to represent the changes we make to our database schema over time. Migrations are used to update the database to reflect changes in our data model (e.g., adding or removing tables, columns, or relationships).
+
+### Migration Steps:
+
+1. Create or Modify Entities
+2. Generate a Migration
+3. Review the Migration
+4. Apply and Update the Migration
