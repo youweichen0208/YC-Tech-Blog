@@ -479,6 +479,32 @@ public class TrainingDbContext:DbContext
 - **Microsoft.EntityFrameworkCore.Design**:
   This package contains the design-time components for Entity Framework Core. It's needed for migrations and other design-time operations during development
 
+## Steps before Migrations:
+
+1. Create DbContext class in Data folder
+2. Configure "ConnectionStrings" in appsettings.json file
+
+```json
+ "ConnectionStrings": {
+    "ShippingDB": "Server=localhost;Database=ShippingDB;User=SA;Password=<YourStrong@Passw0rd>;TrustServerCertificate=True"
+  }
+```
+
+3. Configure Entity Framework Core in an ASP.NET Core Application
+
+```csharp
+builder.Services.AddDbContext<ShippingDbContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString("ShippingDB"));
+});
+```
+
+- The `AddDbContext` method is used to register the `ShippingDbContext` (which is a class that I've created to interact with my database using Entity Framework Core) with ASP.NET Core's dependency injection container. This means that an instance of `ShippingDbContext` can be automatically provided (or "injected") into our controllers or other classes that need it.
+
+- The ` option.UseSqlServer(builder.Configuration.GetConnectionString("ShippingDB"))` part of the code is configuring the `ShippingDbContext` to use SQL Server as the database provider and specifying the connection string to use to connect to the database.
+
+- So overall, this code is registering a "context of session with the database" with the application and configuring it to use a specific database and connection string.
+
 ## Migrations in the DbContext
 
 In Entity Framework Core, a migration is a way to represent the changes we make to our database schema over time. Migrations are used to update the database to reflect changes in our data model (e.g., adding or removing tables, columns, or relationships).
@@ -489,3 +515,70 @@ In Entity Framework Core, a migration is a way to represent the changes we make 
 2. Generate a Migration
 3. Review the Migration
 4. Apply and Update the Migration
+
+## ModelState.IsValid
+
+`ModelState.IsValid` is a property in ASP.NET Core MVC that indicates whether the submitted form data is valid or not. When a form is submitted in an ASP.NET Core MVC application, the data in the form is bound to a model object. This process is known as model binding.
+
+As part of model binding, validation rules are checked against the data that was submitted. These validation rules can be specified using data annotation attributesd like `[Required]`, `[StringLength]`, `[Range]`, etc, on the properties of the model class.
+
+If all validation rules pass, `ModelState.IsValid` will be `true`. If any validation rule fails, `ModelState.IsValid` will be false, and `ModelState` will contain information about which rules failed.
+
+## Repositories
+
+In the context of Clean Architecture, the Repository pattern is a way to abstract away the details of data access from the rest of the application.
+
+### Repositories in Application Core:
+
+In the Application Core, we would define interfaces for our repositories. These interfaces represent the operations that our application needs to perform on our entities, like adding, updating, deleting, or retrieving them. By defining these as interfaces in the Application Core, our business logic can depend on these interfaces without knowing anything about how data access is actually implemented.
+
+```csharp
+public interface IBaseRepository<T> where T:class
+{
+    int Add(T entity);
+    int Update(T entity);
+    int Delete(int id);
+
+    IEnumerable<T> GetAll();
+
+    T GetById(int id);
+}
+```
+
+- `IBaseRepository<T>` is a generic interface that defines common CRUD operations for any entity class `T`. The `where T : class` constraint ensures that this interface can only be used with reference types.
+
+```csharp
+public interface ICustomerRepository : IBaseRepository<Customer>
+{
+
+}
+```
+
+- By extending `IBaseRepository<Customer>`, `ICustomerRepository` inherits methods for adding, updating, deleting, and retrieving `Customer` entities. We can also add additional methods in `ICustomerRepository` that are specificc to handling `Customer` entities.
+
+### Repositories in Infrastructure
+
+In the Infrastructure layer, we would implement these repository interfaces. These implementations would contain the actual data access code, which might use Entity Framework, Dapper, ADO.NET, or any other data access technology.
+
+```csharp
+public class BaseRepository<T> : IBaseRepository<T> where T : class
+{
+    protected readonly ShippingDbContext _shippingDbContext;
+
+    public BaseRepository(ShippingDbContext context)
+    {
+        _shippingDbContext = context;
+    }
+    public int Add(T entity)
+    {
+        _shippingDbContext.Set<T>().Add(entity);
+        return _shippingDbContext.SaveChanges();
+    }
+}
+```
+
+- `protected readonly ShippingDbContext _shippingDbContext`: This line declares a protected, read-only field for the `ShippingDbContext`. This is the Entity Framework context that will be used to interact with the database.
+
+- `public BaseRepository(ShippingDbContext context){  _shippingDbContext = context}`: This is the constructor for the `BaseRepositpory<T>` class. It takes a `ShippingDbContext` as a parameter and assigns it to the `_shippingDbContext` field. The reason for doing this is to use depenedency injection to create the instance of ShippingDbContext.
+
+- `public int Add(T entity) {...}`: This is the implementation of the `Add` method from the `IBaseRepository<T>` interface. It adds the given entity to the `DbSet<T>` for that entity type in the `ShippingDbContext`, and then calls `SaveChanges` to save the changes to the database.
