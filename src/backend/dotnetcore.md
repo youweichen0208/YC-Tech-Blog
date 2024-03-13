@@ -643,7 +643,7 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     // Configure the one-to-many relationship between Author and Book
     modelBuilder.Entity<Author>()
-        .HasKey(a => a.AuthorId);
+        .HasKey(a => a.AuthorId); //this method is used to configure the primary key of Author entity.
 
     modelBuilder.Entity<Book>()
         .HasKey(b => b.BookId)
@@ -659,4 +659,44 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 
 ```
 
-- `.Property()` method in Entity Framework Core's Fluent API is used to configure the properties of an entity.
+- `.Property()` method in Entity Framework Core's Fluent API is used to configure the properties of an entity type. The `Property(b=>b.Title)` method is used to get a reference to the `Title` property of the `Book` entity. Once we have this reference, we can chain additional methods to configure the property.
+- In this case, `.IsRequired()` is chained to the `Property` method, which configures the `Title` property to be required. This means that the database column for `Title` will be created as **NOT NULL**, and Entity Framework will validate that this property is not null before saving an entity to the database.
+- `HasKey(a=>a.AuthorId)`: This method is used to configure the primary key of an entity. In this case, it's saying that the `AuthorId` property is the primary key of the `Author` entity.
+- `HasMany(a=>a.Books)`: This method is used to configure the many side of a one-to-many relationship. In this case, it's saying that an `Author` entity can be associated with many `Book` entities.
+- `HasForeignKey(b=>b.AuthorId)`: This method is used to configure the foreign key for a relationship. In this case, it's saying that the `AuthorId` property on the `Book` entity is the foreign key for the relationship with the `Author` entity.
+
+### Many to many relationships in Fluent API:
+
+In Entity Framework Core, many-to-many relationships involve an entity that has a collection of another entity, and vice versa. For example, a `Post` entity might have a collection of `Tag` entities (because a post can have multiple tags), and a `Tag` entity might have a collection of `Post` entities (because a tag can be associated with multiple posts). In EF Core 5.0 and later, many-to-many relationships can be configured without explicitly defining a join/junction entity (table).
+
+```csharp
+public class Post
+{
+    public int PostId { get; set; }
+    public string Title { get; set; }
+    public ICollection<Tag> Tags { get; set; }
+}
+
+public class Tag
+{
+    public string TagId { get; set; }
+    public ICollection<Post> Posts { get; set; }
+}
+
+public class BlogContext : DbContext
+{
+    public DbSet<Post> Posts { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Post>()
+            .HasMany(p => p.Tags)
+            .WithMany(p => p.Posts);
+    }
+}
+```
+
+In this code, the `Post` entity has a collection of `Tag` entities, and the `Tag` entity has a collection of `Post` entities. The `HasMany` and `WithMany` methods are used to configure the many-to-many relationship.
+
+Behind the scenes, EF Core will create a join table to manage the many-to-many relationship. However, we don't need to create an entity class for this join table unless we want to add additional properties to it.
