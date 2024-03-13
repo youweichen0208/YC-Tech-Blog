@@ -128,7 +128,7 @@ static async Task WaitAndApologizeAsync()
 
 `WaitAndApologizeAsync` is awaited by using an await statement instead of an await expression, similar to the calling statement for a synchronous void-returning method. The application of an await operator in this case doesn't produce a value. When the right operand of an `await` is a `Task<TResult>`, the `await` expression produces a result of `T`. When the right operand of an `await` is a Task, the `await` and its operand are a statement.
 
-### Task<TResult> return type
+### `Task<TResult>` return type
 
 The `Task<TResult>` return type is used for an async method that contains a return statement in which the operand is `TResult`.
 
@@ -168,7 +168,7 @@ We can use the `void` return type in asynchronous event handlers, which require 
 
 In multithreaded programming, concurrency is achieved by executing multiple threads simultaneously, each performing a separate task. These threads can run concurrently on multiple CPU cores. In contrast, async/await is a cooperative concurrency model where tasks yield control back to the calling thread when they are waiting for asynchronous operations to complete. This allows the same thread to be used for multiple tasks, reducing the overhead of creating and managing multiple threads.
 
-## Explain the scenarios where would we use `Task.WhenAny()` and Task.WhenAll()?
+## Explain the scenarios where would we use `Task.WhenAny()` and `Task.WhenAll()`?
 
 ### `Task.WhenAny()`:
 
