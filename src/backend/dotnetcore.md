@@ -388,6 +388,20 @@ This layer is responsible for communicating with the database or any other stora
 
 The compile-time dependencies run from the top to the bottom. The User Interface layer depend on the Business Logic Layer. Business Logic Layer depends on the Data Access Layer. In a traditional N-Layer architecture without the use of interfaces or dependency inversion, the Business Logic Layer (BLL) would directly instantiate and use classes from the Data Access Layer. This means that the Business Logic Layer (which holds the most important logic in the application) is dependent on data access implementation details (and often on the existence of a database). Testing business logic in such an architecture is often difficult, requiring a test database.
 
+## ORM:
+
+Object-relational mapping (ORM) is a technique that allows developers to work with a database using an object-oriented model, rather than using SQL statements. ORM frameworks provide a mapping between the object-oriented model and the relational model of the database, allowing developers to work with objects and collections of objects in their code, rather than with tables and rows in a database.
+
+## Entity Framework (EF):
+
+Entity Framework (EF) Core is a lightweight, extensible, open source and cross-platform library to access database. EF Core serves as ORM by mapping between database objects and .NET objects. It helps developers save time by eliminating the need to write most of the data access code that otherwise can be time consuming.
+
+### The downsides of EF Core ORM:
+
+Even though EF Core ORM has many advantages and helps developers in many ways, there are some downsides to it.
+
+EF Core hides the database so well that sometimes we forget what's happening behind the scenes on the databse side of things. Sometimes we might write C# code that works well in .NET world but does not necessarily translate well in the database world. Sometimes we might write C# LINQ code that is complex and EF Core might generate a SQL statement which is not necessarily an optimized SQL.
+
 ## Clean Architecture
 
 Clean architecture puts the business logic and application model at the center of the application. Instead of having business logic depend on data acess or other infrastructure concerns, this dependency is inverted: insfrastructure and implementation details depend on the Application Core. This functionality is achieved by defining abstractions, or interfaces.
@@ -424,6 +438,55 @@ The uer interface layer in an ASP.NET Core MVC application is the entry point fo
 - Custom Middleware
 - Views, Partial Views & View Components
 - Startup/Program.cs
+
+## Dependency Injection:
+
+### Dependency Inversion Principle:
+
+1. Dependency Inversion Principle states that High-level modules should not depend on low-level modules. Both should depend on abstractions.
+2. Abstractions should not depend on details. Details should depend on abstractions.
+
+For example, if a high-level module like a `Service` class depends on a low-level module like a `DataAccess` class, then the `Service` class is directly dependent on the specific implemntation of `DataAccess`. By introducing an interface (like `IDataAccess`), both `service` and `DataAccess` can depend on this abstraction, and the `Service` class can work with any class that implements `IDataAccess`. This makes the `Service` class more flexible and easier to test, because the data acess implementation can be easily swapped or mocked.
+
+### Constructor Injection
+
+In .NET Core, if we are using constructor injection to inject dependencies, we need to register these dependencies in the DI container. This is typically done in `Program.cs` file.
+
+Register IProductService in the `Program.cs`:
+
+```csharp
+builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
+```
+
+Once a service is registered, it can be injected into the constructors of our controllers, Razor PaGES, or other services. The DI container will automatically create and inject the appropriate instance when needed.
+
+```csharp
+public class ProductsController : Controller
+    {
+        private readonly IProductService _productService;
+        public ProductsController(IProductService productService)
+        {
+            _productService = productService;
+        }
+        public IActionResult ProductsByCategory(string category, int pageSize = 30, int pageNumber = 1)
+        {
+            var products = _productService.GetProductsByCategory(category, pageSize, pageNumber);
+            return View("PagedIndex", products);
+        }
+        public IActionResult ProductDetail(int id)
+        {
+            var product = _productService.GetProductByIdAsync(id);
+            return View(product);
+        }
+    }
+```
+
+### Service Lifetimes:
+
+- `AddTransient`: a new instance is created every time the service is requested.
+- `AddScoped`: A new instance is created once per request/session scope
+- `AddSingleton`: A single instance is created and used for the entire application lifetime.
 
 ## DB Context:
 
@@ -583,6 +646,8 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
 
 - `public int Add(T entity) {...}`: This is the implementation of the `Add` method from the `IBaseRepository<T>` interface. It adds the given entity to the `DbSet<T>` for that entity type in the `ShippingDbContext`, and then calls `SaveChanges` to save the changes to the database.
 
+## Dapper
+
 ## Fluent API
 
 Fluent API is a way of designing APIs in a more readable and expressive manner, often used in .NET Core for configuring and building complex objects. In Entity Framework Core, Fluent API is commonly used for configuring database models.
@@ -700,3 +765,112 @@ public class BlogContext : DbContext
 In this code, the `Post` entity has a collection of `Tag` entities, and the `Tag` entity has a collection of `Post` entities. The `HasMany` and `WithMany` methods are used to configure the many-to-many relationship.
 
 Behind the scenes, EF Core will create a join table to manage the many-to-many relationship. However, we don't need to create an entity class for this join table unless we want to add additional properties to it.
+
+## REST APIs and RESTful web services
+
+### What are REST APIs?
+
+A REST API, sometimes also referred to as RESTful API, is an application programming interface (API or web API) that conforms to the contraints of REST Architectural style and rules and allows for interaction with RESTful web services. REST stands for representational state transfer. These APIs are a way for us to connect the front end of our application to our backend, since if our backend is built as an API our frontend Angular application can simply make HTTP requests to the API in order to fetch data, create user accounts, handle authentication and password checking, and everything we could need to do.
+
+### What are the architectural constraints of a REST API?
+
+1. **Client-server architecture:**
+   An API's job is to connect two pieces of software without limiting their own functionalities, which means that the client. which makes the requests, and the server, that gives the responses, stay separate and independent. When this is done properly, the client and server can update and evolve in different directions without it having an impact on the quality of their data exchange, which is especially important when a server has plenty of clients they have to send data to, as it increases reusability.
+
+2. **Statelessness:**
+   Statelessness means that the API has to hanlde calls independently of each other. This means that each and every API call has to contain the data and commands necessary to complete the desired action. For example, for a non-stateless API perhaps only the first call made has to contain the API key or user authentication token, which is then stored server side, and following calls would depend on that first call since it provides the client's credentials. In a stateless API, each and every call will contain the API key, and the server will expect to see proof of access each time. The advantage to this is that one bad or failed call doesn't affect or derail the ones that come after it.
+
+3. **Uniform Interface:**
+   While we said the client and server can change in different ways, there still has to be some uniformity to the API so that it can still facilitate communication. Due to that, REST APIs have to use a uniform interface that can easily accomodate all connected clients or software. In most cases, that interface is based on the HTTP protocols. Besides tha fact it sets rules as to how the client and the server may interact, it als has the advantage of being widely known and used on the internet. Data is stoted and exchanged through JSON files because of their versatility.
+
+4. **Layered System**:
+   In order to keep the API easy to understand and improve scalability, RESTful architecture dictates that the design of the API is structured into layers that operate together, such as a business logic layer, a data access layer, etc. With a clear hierarchy for these layers, executing a command means that each layer does its function and then sends the data to the next layer. Connected layers can communicate with each other, but not with every component of the program.
+
+5. **Cacheability:**
+   Cacheability means that option to temporarily "cache" data or store it on the client's side, usually used for data that is repetitive or will be used a lot throughout the application. The reason this is necessary for REST APIs is that it is common for a stateless API's requests to have a large overhead, and in some cases that's unavoidable, but for repeated requests that need the same data over and over again, caching that information can make a huge difference. That way the server only has to send that data to the client once, and instead of the client making serveral difficult or costly requests, they can just use that stored version of the data when they need it. This cuts down our API requests' overhead and improves our application's performance.
+
+6. **Code on Demand:**
+   Code on Demand is a concept that essentially boils down to allowing code or applets to be sent through the API and used for the application by the clients. Unlike the previous constraints, this last one is optional, The reason is that code on demand can be a big security risk to an API, especially those used by the general public. Allowing unknown code from a shady or unverified source can have terrible consequences for our application and the security of our data, so it is best to leave this constraint for internal APIs where we have less to fear from hackers and people with bad intentions. The advantage of this feature is that it can essentially help the client implement their own features on the go, meaning it permits the whole system to be much more scalable and agile.
+
+## Dapper
+
+Dapper is a simple object mapper for .NET and micro-ORM in terms of speed and is virtually as fast as using a raw ADO.NET data reader.
+
+### ADO.NET:
+
+ADO.NET is a data access technology provided by Microsoft as part of the .NET Framework.
+
+### Why Dapper?
+
+- Dapper is the second fastest ORM.
+- Perform CURD operations directly using IDBConnection object.
+- Provide querying static and dynamic data over database.
+- Get generic result for simple or complex data type.
+- Dapper allow to store bulk data at once.
+
+### How Dapper Works
+
+- Dapper has three steps to work
+- Create an IDbConnection object
+- Write a query to perform CRUD operations.
+- Pass query as a parameter in Execute method.
+
+### Methods:
+
+Dapper extends IDbConnection interface with multiple methods
+
+- Execute
+- Query
+- QueryFirst
+- QueryFirstOrDefault
+- QuerySingle
+- QuerySingleOrDefault
+- QueryMultiple
+
+### Dapper - Execute
+
+Execute is an extension method which can be called from any object of type IDbConnection. It can execute a command one or multiple times and return the number of affected rows. This method is usually used to execute:
+
+- Stored Procedure
+- INSERT Statement
+- UPDATE Statement
+- DELETE Statement
+
+```csharp
+   public int Insert(Department entity)
+        {
+
+            var conn = trainingDbContext.GetDbConnection();
+
+            return conn.Execute("Insert into Departments values (@Name,@Location)", entity);
+        }
+```
+
+### Dapper - Query
+
+The `Query` method in Dapper is used to execute a SQL query and map the results to a strongly typed list.
+
+```csharp
+  var departments = connection.Query<Department>("SELECT * FROM Departments");
+```
+
+### Configuration of Dapper in DbContect
+
+```csharp
+public class DapperDbContext
+{
+    private readonly string _connectionString;
+
+    public DapperDbContext(string connectionString)
+    {
+        _connectionString = connectionString;
+    }
+
+    public IDbConnection GetDbConnection()
+    {
+        return new SqlConnection(_connectionString);
+    }
+}
+```
+
+`DapperDbContext` takes a connection string as a parameter and stores it. When we need to execute a query, we can call `GetDbConnection` to get a new `SqlConnection`.
