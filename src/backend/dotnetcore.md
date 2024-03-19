@@ -1008,14 +1008,13 @@ public class MappingProfile : Profile
 }
 ```
 
-4. Register AutoMapper in our `Startup.cs`
+4. Register AutoMapper in our `Program.cs`
 
 ```csharp
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddAutoMapper(typeof(Startup));
-    // other services...
-}
+
+builder.Services.AddAutoMapper(typeof(Program));
+// other services...
+
 ```
 
 5. Inject IMapper into our controller and use it to map our objects
