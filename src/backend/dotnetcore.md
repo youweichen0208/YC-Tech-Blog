@@ -204,6 +204,12 @@ return View(Orders);
 return View("Orders", Orders);
 ```
 
+## DTO data transfer object:
+
+A Data Transfer Object (DTO) is a design pattern used in software architecture, DTOs are simple objects that are used to transport data between layers in an application. They do not contain any business logic but only attribute fields.
+
+DTOs are often used in conjunction with Object-Relational Mapping(ORM) frameworks to select, insert, or update data in a database. They can also be used in APIs to define the shape of data that's sent over the network.
+
 ## Bind Query String to an Action Method Parameters in MVC
 
 In ASP.NET Core MVC, we can bind query string values to action method parameters directly. The model binding system takes care of this for us.
@@ -874,3 +880,166 @@ public class DapperDbContext
 ```
 
 `DapperDbContext` takes a connection string as a parameter and stores it. When we need to execute a query, we can call `GetDbConnection` to get a new `SqlConnection`.
+
+## Starting the Web API:
+
+### Registering controllers for handling incoming HTTP requests and sending HTTP responses
+
+In the context of a Web API, we should enable the framework to handle incoming HTTP requests, route them to the correct controller actions, bind request data to action parameters, and serialize responses. So we should add services and dependency injection for API controllers in the `Program.cs` file.
+
+```csharp
+builder.Services.AddControllers();
+```
+
+### `[Route]`:
+
+This attribute is used to define the route template that the controller's actions will use. For example, if we have a `ProductsController` and we apply the `[Route("api/products")]` attribute to it, the actions in the controller will be available under the `/api/products` path. We can also use tokens in the route template, like `[Route("api/[controller]")]`, where `[Controller]` will be replaced with the name of the controller.
+
+### `[ApiController]`:
+
+This attribute is used to mark a controller as an API controller and enables certain API-specific behaviors. For example, it enables attribute routing, automatic HTTP 400 responses when model validation fails, and binding source parameter inference. It's typically used in controllers that serve HTTP API responses, as opposed to controllers that serve views in an MVC application.
+
+```csharp
+[HttpGet]
+public IActionResult Index(int? page)
+{
+    if (page > 0)
+    {
+        var products = _productRepository.pagination(page.Value);
+        return Ok(products);
+    }
+    else
+    {
+        var allProducts = _productRepository.GetAll();
+        return Ok(allProducts);
+    }
+}
+```
+
+- `page` is declared as `int?`, which means it is a nullable integer. Nullable types are instances of the `Systen.Nullable<T>` struct. A nullable type can represent the normal range of values for its underlying value type, plus an additional null value.
+
+- When we check `page.HasValue` and it's `true`, it means that page is not null and contains a valid integer value. We can then access this value using `page.value`.
+
+- If we try to use `page` directly without checking `HasValue` or calling `Value`, we might encounter a `InvalidOperationException` if `page` is null. This is why it is a good practice to check `HasValue` before accessing `Value`.
+
+## HTTP status code:
+
+In ASP.NET Core Web API, we can return HTTP status code using various helper methods available in the `ControllerBase` class.
+
+### 200 OK:
+
+This indicates that the request has succeeded. We can return this status code using the `Ok` method. For example:
+`return Ok(product)`
+
+### 201 Created:
+
+This indicates that the request has been fulfilled and has resulted in one or more new resources being created. You can return this status code using the `CreatedAtAction` or `CreatedAtRoute` methods.
+
+### 204 No Content:
+
+This indicates that the server has successfully fulfilled the request and there is no additional content to send in the response payload body. We can return this status code using the `NoContent` method. For example, `return NoContent();`.
+
+### 400 Bad Request:
+
+This indicates that the server could not understand the request due to invalid syntax, We can return this status code using the `BadRequest` method. For example: `return BadRequest("Invalid input");`.
+
+### 401 Unauthorized:
+
+This indicates that the request requires user authentication. We can return this status code using the `Unauthorized` method. For example: `return Unauthorized();`.
+
+### 403 Forbidden:
+
+This indicates that the server understood the request, but it is refusing to authorize it. We can return this status code using the `Forbid` method. For example: `return Forbid();`
+
+### 404 Not Found:
+
+This indicates that the server cab't find the requested resource. We can return this status code using the `NotFound` method. For example: `return NotFound();`
+
+### 500 Internal Server Error:
+
+This indicates that the server encountered an unexpected condition that prevented it from fulfilling the request. We can return this status code using the `StatusCode` method. For example, `return StatusCode(500, "Internal server error");`.
+
+```csharp
+  [HttpPost]
+    public IActionResult AddProduct([FromBody]Product product)
+    {
+        if (product == null)
+        {
+            return BadRequest("Product cannot be null");
+        }
+
+        _productRepository.Add(product);
+        return CreatedAtAction(nameof(GetProduct), new { id = product.ProductId }, product);
+    }
+```
+
+- `[FromBody]` attribute tells the framework to get the value of the `product` parameter from the body of the HTTP request, and to attempt to deserialie it into a `Product` object.
+
+- `if (product == null) { return BadRequest("Product cannot be null"); }` checks if the `product` parameter is null. If it is, the method returns a 400 Bad Request response with a custom error message.
+- `return CreatedAtAction(nameof(GetProduct), new { id = product.ProductId }, product);` the method returns a 201 Created response. The `CreatedAtAction` method is used to generate the `Location` header of the response, which provides the URI of the newly created product. The newly created product is included in the response body.
+
+## AutoMapper
+
+AutoMapper is a library in .NET that simplifies the process of mapping one object to another. It can be particularly useful in a Web API project when we need to map domain models to DTOs (Data Transfer Objects).
+
+1. Installl the AutoMapper.Extensions.Microsoft.DependencyInjection Nuget package.
+2. Create our DTOs. For example:
+
+```csharp
+public class ProductDto
+{
+    public string ProductName { get; set; }
+    public decimal ProductPrice { get; set; }
+    public string ProductCategory { get; set; }
+    public string ProductSeller { get; set; }
+}
+```
+
+3. Create a mapping profile. This is where we define how to map our objects.
+
+```csharp
+public class MappingProfile : Profile
+{
+    public MappingProfile()
+    {
+        CreateMap<Product, ProductDto>();
+        CreateMap<ProductDto, Product>();
+    }
+}
+```
+
+4. Register AutoMapper in our `Startup.cs`
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddAutoMapper(typeof(Startup));
+    // other services...
+}
+```
+
+5. Inject IMapper into our controller and use it to map our objects
+
+```csharp
+public class ProductsController : ControllerBase
+{
+    private readonly IMapper _mapper;
+    private readonly IProductRepository _productRepository;
+
+    public ProductsController(IMapper mapper, IProductRepository productRepository)
+    {
+        _mapper = mapper;
+        _productRepository = productRepository;
+    }
+
+    [HttpGet]
+    public IActionResult Get()
+    {
+        var products = _productRepository.GetAll();
+        var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
+        return Ok(productDtos);
+    }
+}
+```
+
+In this example, AutoMapper is used to map a list of `Product` objects to a list of `ProductDto` objects. The mapping is defined in the `MappingProfile` class.
