@@ -1042,3 +1042,101 @@ public class ProductsController : ControllerBase
 ```
 
 In this example, AutoMapper is used to map a list of `Product` objects to a list of `ProductDto` objects. The mapping is defined in the `MappingProfile` class.
+
+## Microservices
+
+Microservices is an architectural style that structures an application as a collection of small autonomous services, modeled around a business domain.
+
+In the context of .NET, microservices are typically small, independently deployable applications that communicate with each other via APIs. They can be developed, deployed, and scaled independently, which makes them a good choice for large, complex applications.
+
+- **Autonomous**: Each microservice can be developed, deployed, updated, and scaled independently.
+- **Distributed Development**: Different teams can develop different microservices using the technologies they are most comfortable with, as long as they adhere to the defined APIs for communication.
+- **Isolation of Faults**: If one microservice fails, it doesn't affect the others.
+- **Data Isolation**: Each microservice can have its own separate database, ensuring data consistency within the service boundary.
+- **Scalability**: Individual components can be scaled independently, allowing for more efficient use of resources.
+
+## HttpClient
+
+### Introduction
+
+In a microservice architecture, services often need to communicate with each other over HTTP. The `HttpClient` class in .NET Core is designed to send HTTP requests and receive HTTP responses from a resource identified by URI. It provides a modern, asynchronous, and composable API for sending HTTP requests and receiving responses.
+
+### Create an instance of HttpClient
+
+First, we need to create an instance of `HttpClient`. It's recommended to use `HttpClientFactory` to create `HttpClient` instances to avoid socket exhaustion that can occur when maunally creating `HttpClient` instances.
+
+```csharp
+public class MyService
+{
+    private readonly IHttpClientFactory _clientFactory;
+
+    public MyService(IHttpClientFactory clientFactory)
+    {
+        _clientFactory = clientFactory;
+    }
+}
+```
+
+### Send a GET request
+
+We can send a GET request using the `GetAsync` method. This method sends a GET request to the specified Uri and returns the response body as a string.
+
+```csharp
+public async Task<string> GetPageAsync(string url)
+{
+    var client = _clientFactory.CreateClient();
+    var response = await client.GetAsync(url);
+
+    if (response.IsSuccessStatusCode)
+    {
+        return await response.Content.ReadAsStringAsync();
+    }
+    else
+    {
+        return null;
+    }
+}
+```
+
+### Send a POST request
+
+We cans send a POST request using the `PostAsync` method. This method sends a POST request to the specified Uri as an asynchronous operation.
+
+```csharp
+public async Task<string> PostDataAsync(string url, object data)
+{
+    var client = _clientFactory.CreateClient();
+    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+    var response = await client.PostAsync(url, content);
+
+    if (response.IsSuccessStatusCode)
+    {
+        return await response.Content.ReadAsStringAsync();
+    }
+    else
+    {
+        return null;
+    }
+}
+```
+
+### Error handling
+
+It is important to handle potential errors that might occur during the request. We can do this by checking the `IsSuccessStatusCode` property of the `HttpResponseMessage` object.
+
+```csharp
+public async Task<string> GetPageAsync(string url)
+{
+    var client = _clientFactory.CreateClient();
+    var response = await client.GetAsync(url);
+
+    if (response.IsSuccessStatusCode)
+    {
+        return await response.Content.ReadAsStringAsync();
+    }
+    else
+    {
+        throw new HttpRequestException($"Request to {url} failed with status code {response.StatusCode}");
+    }
+}
+```
