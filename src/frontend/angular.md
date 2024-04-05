@@ -619,3 +619,82 @@ export class AppRoutingModule {}
 ```
 
 5. To navigate to a route, use the `[routerLink]` directive
+
+## HttpClient
+
+The `HttpClient` is a built-in service in Angular for making HTTP requests. It's part of the `HttpClientModule`.
+
+1. **Import the `HttpClientModule` in our `app.module.ts`**
+
+```ts
+import { HttpClientModule } from "@angular/common/http";
+
+@NgModule({
+  imports: [
+    // other imports...
+    HttpClientModule,
+  ],
+})
+export class AppModule {}
+```
+
+2. Inject the `HttpClient` in our service:
+
+```ts
+@Injectable({
+  providedIn: "root",
+})
+export class AccountService {
+  private url = "https://localhost:7257";
+  constructor(private http: HttpClient) {}
+  signup(user: any) {
+    return this.http.post(`${this.url}/signup`, user);
+  }
+}
+```
+
+- `@Injectable` means the service is injectable that it can be injected into other classes (like components or other services).
+- The `constructor` of the class injects Angular's `HttpClient` service, which is used to make HTTP requests.
+- The `signup` method takes a `user` object as a parameter and sends a POST request to the `/signup` endpoint on the backend server.
+
+3. Inject the Service class in the Component class:
+
+```ts
+@Component({
+  selector: "app-signup",
+  templateUrl: "./signup.component.html",
+  styleUrl: "./signup.component.css",
+})
+export class SignupComponent {
+  constructor(private accountService: AccountService) {}
+
+  onSubmit() {
+    if (this.form.valid) {
+      let firstName: string = this.form.value.firstname as string;
+      let lastName: string = this.form.value.lastname as string;
+
+      // Capitalize first letter of first name
+      firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+      // Capitalize first letter of last name
+      lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
+      let user: User = {
+        name: firstName + " " + lastName,
+        email: this.form.value.email as string,
+        password: this.form.value.password as string,
+        phone: this.form.value.phone as string,
+      };
+
+      this.accountService.signup(user).subscribe(
+        (response) => {
+          console.log(response);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+      console.log(this.form.value);
+    }
+  }
+}
+```
