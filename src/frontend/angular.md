@@ -546,6 +546,8 @@ export class SignupComponent {
 
 - In Angular, the `touched` property of a form control is a boolean that indicates whether the user has interacted with the control.
 
+- In Angular's Reactive Forms, `form.controls` is a property that returns an object containing all the `FormControl` instances in the `FormGroup`.
+
 - **Notice: In the `Validators` class in Angular, the methods for minimum and maximum length validation are `minLength` and `maxLenth`, respectively. However, when accessing these validation errors in the `errors` object of a form control, they are all lowercase: `minlength` and `maxlength`. When checking for these validation errors, we should use `form.controls.password.errors?.['minlength']` and `form.controls.password.errors?.['maxlength']`**
 
 3. **Associate the `FormGroup` model and view**:
