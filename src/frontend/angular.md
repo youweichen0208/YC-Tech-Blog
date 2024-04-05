@@ -45,6 +45,12 @@ The `app.module.ts` file is the root module of an Angular application. It's wher
 
 ## Component
 
+A component controls a patch of screen called a view. It consists of a TypeScript class, an HTML template, and a CSS style sheet. The TypeScript class defines the interaction of the HTML template and the rendered DOM structure, while the style sheet describes its appearance.
+
+### Component metadata
+
+The `@Component` decorator identifies the class immediately below it as a component class, and specifies its metadata. The typescript class is not a component until we mark it as one with the `@Component` decorator. The metadata associates a template (html code) with the component. Together, the component and its template describe a view.
+
 ### Create a new component in Angular using CLI
 
 ```
@@ -223,7 +229,72 @@ export class AppComponent {
 
 In this example, when an item is clicked, the `onClick` method is called with the clicked item.
 
-## Two way binding in Angular
+## Directives
+
+Directives are a core feature of Angular. They are classes that add additional behavior to elements in our Angular applications. Directives allow us to create highly dynamic and responsive views. Use Angular's built-in directives to manage forms, lists, styles, and what users can see.
+
+### **Component Directives**:
+
+These are the most common type of directives and are essentially classes that are declared with the `@Component` decorator. Each component we create in Angular is a directive and can encapsulate its own view and logic.
+
+### **Attribute Directives**:
+
+Attribute directives listen to and modify the behavior of other HTML elements, attributes, properties, and components.
+
+The most common attribute directives are as follows:
+
+- **NgClass**
+  Add or removes a set of CSS classes.
+
+```ts
+// app.component.ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+})
+export class AppComponent {
+  isSpecial = true;
+}
+```
+
+```html
+<!-- app.component.html -->
+<div [ngClass]="{'special': isSpecial}">
+  This div has the 'special' class if isSpecial is true
+</div>
+```
+
+In this example, the `div` will have the `special` class if `isSpecial` is `true`. If `isSpecial` is `false`, the `special` class will be removed. The `ngClass` directive is a good way to set classes dynamically, but for static classes, it's usually better to use the standard `class` attribute.
+
+- **NgStyle**:
+  Add or removes a set of HTML styles.
+
+```ts
+// app.component.ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+})
+export class AppComponent {
+  isSpecial = true;
+}
+```
+
+```html
+<!-- app.component.html -->
+<div [ngStyle]="{'color': isSpecial ? 'red' : 'black'}">
+  This text is red if isSpecial is true, otherwise it's black
+</div>
+```
+
+In this example the color of the text in the `div` is red if `isSpecial` is `true`, and black if `isSpecial` is `false`.
+
+- **NgModel**:
+  Adds two-way data binding to an HTML form element
 
 Two-way data binding in Angular is a mechanism to synchronize the model and the view. Changes in the model update the view, and changes in the view update the model. Angular provides the `[(ngModel)]` directive for two-way data binding. To use `[(ngModel)]`, we need to import `FormsModule` from `@angular/forms` in our module.
 
@@ -248,14 +319,6 @@ export class AppComponent {
 
 In this example, the `input field` and the `p` tag are bound to the `name` property of the component. When we type in the `input` field, the `name` property is updated, and the updated `name` is displayed in the `p` tag.
 
-## Directives
-
-Directives are a core feature of Angular. They are classes that can manipulate the DOM by changing its layout or behavior. Directives allow us to create highly dynamic and responsive views.
-
-- **Component Directives**: These are the most common type of directives and are essentially classes that are declared with the `@Component` decorator. Each component we create in Angular is a directive and can encapsulate its own view and logic.
-
-- **Attribute Directives**: These directives change the appearance or behavior of a DOM element, component, or another directive.
-
 - **Structural Directives**: These directives change the DOM layout by adding and removing DOM elements. These are responsible for HTML layout. Examples are the built-in `*ngFor` and `*ngIf` directives.
 
 ```html
@@ -263,7 +326,11 @@ Directives are a core feature of Angular. They are classes that can manipulate t
 <div *ngFor="let item of items">{{ item }}</div>
 ```
 
-### ngIf directive
+### Structural directives:
+
+Structural directives change the DOM layout by adding or removing DOM elements.
+
+- **ngIf directive**
 
 The `*ngIf` directive in Angular is used to conditionally include or exclude a block of HTML from the DOM. The `*ngIf` directive is commonly used to output data conditionally based on the state of the component.
 
@@ -291,59 +358,7 @@ export class AppComponent {
 
 In this example, if `showDiv` is `true`, the first `div` is displayed. If `showDiv` is `false`, the `div` inside the `ng-template` with the `#elseBlock` reference is displayed.
 
-### ngStyle directive
-
-The `ngStyle` directive in Angular is used to set CSS styles conditionally. It allows us to set CSS styles dynamically, based on the conditions defined in our component.
-
-```ts
-// app.component.ts
-import { Component } from "@angular/core";
-
-@Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-})
-export class AppComponent {
-  isSpecial = true;
-}
-```
-
-```html
-<!-- app.component.html -->
-<div [ngStyle]="{'color': isSpecial ? 'red' : 'black'}">
-  This text is red if isSpecial is true, otherwise it's black
-</div>
-```
-
-In this example the color of the text in the `div` is red if `isSpecial` is `true`, and black if `isSpecial` is `false`.
-
-### ngClass directive
-
-The `ngClass` directive in Angular is used to dynamically add or remove CSS classes on an HTML element. It's a powerful way to apply styles conditionally.
-
-```ts
-// app.component.ts
-import { Component } from "@angular/core";
-
-@Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-})
-export class AppComponent {
-  isSpecial = true;
-}
-```
-
-```html
-<!-- app.component.html -->
-<div [ngClass]="{'special': isSpecial}">
-  This div has the 'special' class if isSpecial is true
-</div>
-```
-
-In this example, the `div` will have the `special` class if `isSpecial` is `true`. If `isSpecial` is `false`, the `special` class will be removed. The `ngClass` directive is a good way to set classes dynamically, but for static classes, it's usually better to use the standard `class` attribute.
-
-### ngFor directive
+-- **ngFor directive**
 
 The `*ngFor` directive in Angular is a structural directive that is used for rendering a list of items. It's similar to a `for` loop in JavaScript.
 
@@ -366,3 +381,239 @@ export class AppComponent {
 ```
 
 In this example, the `*ngFor` directive iterates over the `items` array from the component. For each item in the array, it creates a new `div` and sets the content of the `div` to the item.
+
+## Services and Dependency Injection:
+
+A service is typically a class with a narrow, well-defined purpose. It should so something specific and do it well.
+
+Ideally, a component's job is to enable only the user experience. A component should present properties and methods for data binding to mediate between the view and the application logic.
+
+A component should use services for tasks that don't involve the view or application logic. Services are good for tasks such as fetching data from the server, validating user input, or logging directly to the console. By defining such processing tasks in an **injectable service class**, we make those tasks available to any component.
+
+```ts
+import { Injectable } from "@angular/core";
+
+@Injectable({
+  providedIn: "root",
+})
+export class MyService {
+  data = "Hello World";
+
+  getData() {
+    return this.data;
+  }
+}
+```
+
+```ts
+import { Component } from "@angular/core";
+import { MyService } from "./my.service";
+
+@Component({
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+})
+export class AppComponent {
+  data: string;
+
+  constructor(private myService: MyService) {
+    this.data = myService.getData();
+  }
+}
+```
+
+## Dependency Injection:
+
+Dependency injection is the part of the Angular framework that provides components with access to services and other resources. Angular provides the ability for us to inject a service into a component to give that component access to the service.
+
+Add the `@Injectable()` decorator to a service class so that Angular can inject it into a component as a dependency.
+
+```ts
+@Injectable({providedIn: 'root'})
+export class HeroService {
+```
+
+The `providedIn` property is part of the `@Injectable` decorator in Angular. It's used to specify where the service should be provided and instantiated.
+
+## template variables
+
+Templates variables help us use data from one part of a template in another part of the template. In the template, we use the hash symbol, `#`, to declare a template variable.
+
+```html
+<input #phone placeholder="phone number" />
+```
+
+```ts
+<input #phone placeholder="phone number" />
+
+<!-- lots of other elements -->
+
+<!-- phone refers to the input element; pass its `value` to an event handler -->
+<button type="button" (click)="callPhone(phone.value)">Call</button>
+```
+
+The template variable, `#phone`, declares a `phone` variable with the `<input>` element as its value.
+
+## Angular Forms
+
+Angular provides two different approaches to handling user input through forms: reactice and template-driven. Both capture user input events from the view, validate the user input, create a form model and data model to update, and provide a way to track changes.
+
+### Template-driven Forms:
+
+Template-driven forms are forms where we write the logic, validations, controls etc, for the form in the template part of the code (html code). The template is responsible for setting up the form, the validation, control, group etc. These forms rely on directives in the template to create and manipulate the underlying object model. They are useful for adding a smple form to an app, such as email list signup form, where the form is going to be static and does not require any change due to interaction.
+
+### Reactive Forms:
+
+Reactive forms on the other hand are forms where we define the structure of the form as well as logic, validation, controls, etc in the component class.
+
+1. **Import ReactiveFormsModule:** First, we need to import `ReactiveFormsModule` in our module file (usually `app.module.ts`) and add it to the `imports` array:
+
+```ts
+import { BrowserModule } from "@angular/platform-browser";
+import { NgModule } from "@angular/core";
+import { ReactiveFormsModule } from "@angular/forms";
+
+import { AppComponent } from "./app.component";
+import { SignupComponent } from "./signup/signup.component";
+
+@NgModule({
+  declarations: [AppComponent, SignupComponent],
+  imports: [BrowserModule, ReactiveFormsModule],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
+
+2. **Create a `FormGroup` instance**:
+   Create a `FormGroup` property in the component class and set the property to a new form group instance. To initialize the form group, provide the constructor with an object of named keys mapped to their control.
+
+```ts
+import { Component } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+@Component({
+  selector: "app-signup",
+  templateUrl: "./signup.component.html",
+  styleUrl: "./signup.component.css",
+})
+export class SignupComponent {
+  form = new FormGroup({
+    email: new FormControl("", [Validators.required, Validators.email]),
+    password: new FormControl("", [
+      Validators.required,
+      Validators.minLength(6),
+      Validators.maxLength(20),
+      Validators.pattern("^[a-zA-Z0-9]*$"),
+    ]),
+    firstname: new FormControl(""),
+    lastname: new FormControl(""),
+    phone: new FormControl(""),
+  });
+
+  get email() {
+    return this.form.get("email");
+  }
+
+  get password() {
+    return this.form.get("password");
+  }
+  onSubmit() {
+    console.log(this.form.value);
+  }
+}
+```
+
+- Above code is the Reactive form validator example. To see the specific Angular Validator API, go to https://angular.io/api/forms/Validators
+
+- To print the error msg if the validation fails, below is the code snippet of how to handle it in HTML.
+
+```html
+<div
+  *ngIf="
+        password?.errors?.['required'] && form.controls.password.touched
+      "
+  class="error-message"
+>
+  Password is required.
+</div>
+<div
+  *ngIf="(form.controls.password.errors?.['minlength'] || form.controls.password.errors?.['maxlength'] || form.controls.password.errors?.['pattern'])&& form.controls.password.touched"
+  class="error-message"
+>
+  Password needs to be 6-20 alphabet or numeric.
+</div>
+```
+
+- In Angular, the `touched` property of a form control is a boolean that indicates whether the user has interacted with the control.
+
+- **Notice: In the `Validators` class in Angular, the methods for minimum and maximum length validation are `minLength` and `maxLenth`, respectively. However, when accessing these validation errors in the `errors` object of a form control, they are all lowercase: `minlength` and `maxlength`. When checking for these validation errors, we should use `form.controls.password.errors?.['minlength']` and `form.controls.password.errors?.['maxlength']`**
+
+3. **Associate the `FormGroup` model and view**:
+   A form group tracks the status and changes for each of its controls, so if one of the controls changes, the parent control also emits a new status or value change. The model for the group is maintained from its members. After we define the model, we must update the template to reflect the model in the view.
+
+```ts
+<form [formGroup]="profileForm">
+
+  <label for="first-name">First Name: </label>
+  <input id="first-name" type="text" formControlName="firstName">
+
+  <label for="last-name">Last Name: </label>
+  <input id="last-name" type="text" formControlName="lastName">
+
+</form>
+```
+
+Just as a form group contains a group of controls, the profileForm `FormGroup` is bound to the `form` element with the `FormGroup` directive, creating a communication layer between the model and the form containing the inputs.
+
+4. **Save from data**:
+   The `ProfileEditor` component accepts input from the user, but in a real scenario we want to capture the form value and make it available for further processing outside the component. The `FormGroup` directive listens for the `submit` event emitted by the `form` element and emits an `ngSubmit` event that we can bind to a callback function. Add an `ngSubmit` event listener to the `form` tag with the `onSubmit()` callback method.
+
+```ts
+<form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+```
+
+    The `onSubmit()` method in the `ProfileEditor` component captures the current value of `profileForm`. The following example uses `console.warn` to log a message to the browser console.
+
+```ts
+onSubmit() {
+  // TODO: Use EventEmitter with form value
+  console.warn(this.profileForm.value);
+}
+```
+
+## Routing in Angular
+
+Routing in Angular is a mechanism to navigate between different views or components based on the browser's URL or user actions.
+
+```ts
+import { NgModule } from "@angular/core";
+import { HomeComponent } from "./home/home.component";
+import { RouterModule, Routes } from "@angular/router";
+import { LoginComponent } from "./login/login.component";
+import { SignupComponent } from "./signup/signup.component";
+import { ProductsComponent } from "./products/products.component";
+const routes: Routes = [
+  { path: "home", component: HomeComponent },
+  { path: "login", component: LoginComponent },
+  { path: "signup", component: SignupComponent },
+  { path: "products/:category", component: ProductsComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}
+```
+
+1. First, we need to import the `RouterModule` and `Routes` from `@angular/router`
+2. Define the routes. Each route is an object with a `path` and a `component`
+3. Call `RouterModule.forRoot()` and include the result in our application module's `imports` array.
+4. Use the `<router-outlet>` directive to indicate where the router should display the components for each route.
+
+```html
+<a [routerLink]="['/first-component']">Go to First Component</a>
+<a [routerLink]="['/second-component']">Go to Second Component</a>
+```
+
+5. To navigate to a route, use the `[routerLink]` directive
