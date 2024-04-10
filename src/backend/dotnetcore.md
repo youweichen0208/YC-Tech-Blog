@@ -1140,3 +1140,38 @@ public async Task<string> GetPageAsync(string url)
     }
 }
 ```
+
+## Password Hashing
+
+Password hashing is the practice of algorithmically turning a password into ciphertext as a means of blocking against the threat of password breaches. Essentially, one string of characters in a password is transformed into a completely different string using a mathematical hashing function. Once a string(password) has been hashed, there is no way to reverse the process and each time a user logs in, their hashed password is compared with a recored hashed value.
+
+### Salt in password hashing
+
+A "salt" in the context of password hashing is a random value that is generated for each password. This salt is combined with the password before the password is hashed.
+
+The purpose of a salt is to ensure that even if two users have the same password, their hashed passwords will be different, because salts are different.
+
+### BCrypted Hashing function
+
+BCrypt is a password hashing function and is widely used for securing passwords.
+
+The main featues of BCrypt are:
+
+1. **Built-in salt**: BCrypt automatically generates a new salt for each password. This means that even if two users have the same password, their hashed passwords will be different.
+
+2. **Strong security**: BCrypt is considered a strong password hash algorithm. It's recommended by many security experts and is widely used in industry.
+
+In .NET, we can use BCrypt to hash passwords usign the `BCrypt.Net-Next` NuGet package. This package provides methods to hash a password and verify a password against a hash.
+
+1. Install the BCrypt.Net-Next package
+   We can install it via the NuGet package manager or by running the following command in the terminal:
+
+2. Hash a password
+   When a user registers or changes their password, we can hash the passord using the `BCrypt.HashPassword` method:
+
+```csharp
+string password = "userpassword";
+string hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+```
+
+Then, store the `hashPassword` in our database. Never store the plain text password.

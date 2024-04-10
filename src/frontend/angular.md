@@ -698,3 +698,173 @@ export class SignupComponent {
   }
 }
 ```
+
+## Observables in Angular
+
+Observables are a technique for event handling, asynchronous programming, and handling multiple values emitted over time. Observable's primary use is to be "listened" to or "observed" for future events. Listening to these events is done via calling the subscribe() function of the observable when we can access the value that is being emitted. There is no way to invoke the event or value change using an observable alone, so we can think of it as a "read-only" type. Due to this, it is usually best practice to expose Observables in cases where we do not want other parts of the application to invoke events, i.e., we just want them to listen for changes.
+
+### Subscribing
+
+In Angular, subscribing to an observable is the way to consume the data emitted by the observable and handle events such as emission, errors, and completion.
+
+```ts
+import { Observable } from "rxjs";
+
+// Assuming you have an observable called 'myObservable'
+const subscription = myObservable.subscribe(
+  (data) => {
+    // Handle data emission
+    console.log("Received data:", data);
+  },
+  (error) => {
+    // Handle errors
+    console.error("Error:", error);
+  },
+  () => {
+    // Handle completion
+    console.log("Observable completed");
+  }
+);
+```
+
+The `subscribe` method takes three callback functions as arguments:
+
+1. **Next Callback**: This callback is executed whenever the observable emits a new data value. The emitted data is passed as an argument to this callback.
+2. **Error Callbacl**: This callback is executed if an error occurs during the observable execution.
+3. **Complete Callback**: This callback is executed when the observable completes and will not emit any more values (optional).
+
+The `subscribe` method returns a `Subscription` object, which represents the subscription itself. This object has an `unsubscribe` method we can call to cancel the subscription and prevent any memory leaks.
+
+### Analagy
+
+1. Observable is like a youtube channel of someone else. (( It uploads new videos(data) from time to time, **so it is a data source** for us))
+
+2. Our youtube account is an **Observer**
+
+3. Our youtube account **(Observer)** can only get notifications about whether someone else's youtube channel **(Observable)** has uploaded a new video (has new data) or made a livestream **(new event)** only if we have **subscribed** to that channel
+
+**(Observer subscribes Observable to listen for new data/any event)**
+
+where observable is a data source, subscribe is like a method/function , Observer is generally on our side
+
+### Subjects
+
+Subjects **are a type of Observavble**. However, unlike an Observable, Subjects can emit events/values to its subscribers using the `next()` function. Therefore, we can publish changes (using next()) to a Subject and listen for changes (using subscribe()).
+
+The way to differentiate a subject from a BehaviorSubject is:
+
+1. Subjects have no initial value.
+2. Subscribers will only be notified and receive events/values after the subscription is made - i.e., subscribers will not receive the last emitted value upon subscription.
+
+e.g. say we want to use Subjects to notify subscribers when an event has occurred:
+
+```ts
+const subject = new Subject();
+subject.next("event 0");
+subject.subscribe((event) => console.log(event));
+subject.next("event 1");
+subject.next("event 2");
+subject.next("event 3");
+
+/**  
+
+ * Expected output:  
+
+ * event 1  
+
+ * event 2  
+
+ * event 3  
+
+ */
+```
+
+Since event 0 was emitted before the subscription was made, the subscriber will not receive that value. If the use case for a subject requires the Subject to emit that initial value, a BehaviorSubject would be a better choice.
+
+### Behavior Subjects
+
+BehaviorSubjects **are a type of Subject** that:
+
+1. Has an initial value
+2. Subscribers will receive the last emitted value upon subscription.
+
+Using the same code as we used for the Subject, but using a BehaviorSubject instead, we will see now that the 'event 0' will be emitted. Also, notice how we must add an initial value (`event -1`) upon creation of the BehaviorSubject.
+
+```ts
+const behaviorSubject = new BehaviorSubject("event -1");
+behaviorSubject.next("event 0");
+behaviorSubject.subscribe((event) => console.log(event));
+behaviorSubject.next("event 1");
+behaviorSubject.next("event 2");
+behaviorSubject.next("event 3");
+
+/**  
+
+ * Expected output:  
+
+ * event 0  
+
+ * event 1  
+
+ * event 2  
+
+ * event 3  
+
+ */
+```
+
+### When to use Observables vs Subjects vs BehaviorSubjects
+
+**Subjects** are great for when we want to emit an event where the state of the event is not important, i.e. it is not important for the subscribers of the event to know about previous values emitted.
+
+**BehaviorSubjects** are the opposite, they are useful if there is a current "state" of the event that we want all subscribers to be able to access.
+
+**Observables** are useful for exposing Subjects/BehaviorSubjects to other parts of the application while also concealing the ability to emit values/changes.
+
+### `asObservable()`
+
+The `asObservable` method is used in Angular to convert a Subject or BehaviorSubject into an Observable. This is useful when we want to prevent other parts of our code from emitting values to the Subject or BehaviorSubject. Using `asObservable` essentially provides a read-only view of the data stream.
+
+```ts
+ private currentUserSubject = new BehaviorSubject<User>({} as User);
+  public currentUser = this.currentUserSubject.asObservable();
+```
+
+## JWT
+
+JSON Web Tokens(JWT) are a standarized way to security send data between two parties. They contain information(claims) encoded in the JSON format. A JWT is a mechanism for verifying the authenticity of some JSON data. This is possbile because each JWT is signed using cryptography to guarantee that its contents have not been tampered with during transmission or storage.
+
+It's important to note that a JWT guarantees data ownership but not encryption. The reason is that the JWT can be seen by anyone who intercepts the token because it's serialized, not encrypted.
+
+Therefore, it is strongly adviced to use JWTs with HTTPS, a practice that extends to general web security. HTTPS not only safeguards the confidentiality of JWT contents during transmission but also provides a broader layer of protection for data in transit.
+
+### The problem JWT aims to solve
+
+The problem with this approach is that for every request, the server takes a round trip to the database. This process often slows down the application. Here's where JWTs come in.
+
+JWT, especially when used as a session, attempts to eliminate the subsequent database lookup.
+
+Like before, users would log in with their credentials, The server authenticates the user, often by checking the entered credentials against a database. Upon successful login, the server creates a JWT containing user information and a signature to verify its authenticity.
+
+The server sends the JWT to the client. Then, each subsequent request from the client includes the JWT. The server validates the token's signature to ensure it hasn't been tampered with. The user's identity and authorization details are extracted from the token, eliminating the need for constant database lookups.
+
+### The inefficiencies of JWT for user sessions
+
+1. Size constraints:
+   In many complex real-world apps, we may need to store a ton of different information. When used with cookies, this either adds up to a lot of overhead per request or exceeds the allowed storage space for cookies, which is 4KB. This often leads people to store the JWTs in localStorage instead.
+
+   Storing sensitive data in localStorage comes with many problems on its own. For a little context, If we store it inside localStorage, the data accessible by any script inside our page. This is as bad as it sounds: an XSS attack coulg give an external attack access to the token.
+
+2. Token invalidation
+   Invalidating a single token in JWT is a challenge because they are self-contained and do not have a central authority for invalidation, unlike traditional sessions.
+
+   This issue is significant - for instance, when dealing with bad actors, suspending their account won't immediately revoke their access because JWTs persist until expiration.
+
+3. Less secure:
+   While the security risks are minimized by sending JWTs using HTTPS, there is always the possibility that it's intercepted and the data deciphered, exposing our user's data. **Remember, JWTs can be seen by anyone who intercepts the token because it's serialized, not encrypted.**
+
+### How to securely store JWTs in a cookie
+
+A JWT needs to be stored in a safe place inside the user's browser. We already established that storing sensitive data inside localStorage is a bad idea. To reiterate whatever we do, don't store a JWT in localStorage (or sessionStorage). If any of the third-party scripts we include in our page are compromised, it can access all our users' tokens.
+
+To keep them secure, we should always store JWTs inside an HttpOnly cookie. This is a special kind of cookie that's only sent in HTTP requests to the server. It's never accessible (both for reading and writing) from JavaScript running in the server.
