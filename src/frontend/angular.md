@@ -826,9 +826,14 @@ behaviorSubject.next("event 3");
 The `asObservable` method is used in Angular to convert a Subject or BehaviorSubject into an Observable. This is useful when we want to prevent other parts of our code from emitting values to the Subject or BehaviorSubject. Using `asObservable` essentially provides a read-only view of the data stream.
 
 ```ts
- private currentUserSubject = new BehaviorSubject<User>({} as User);
-  public currentUser = this.currentUserSubject.asObservable();
+  private userSubject = new BehaviorSubject<string>('');
+  public username = this.userSubject.asObservable();
 ```
+
+- In the code above, the `BehaviorSubject` holds the value that needs to be shared with other components. These are the current "subjects" of conversation that can be broadcasted to the observers. The special characteristic about `BehaviorSubject` is that it will return the initial value or the current value on subscription.
+- `userSubject` is a `BehaviorSubject`. It's used to hold the current value of the username. The `next()` method is used to change that value.
+- `Observable` on the other hand, is a more general concept. The API for retrieving values from an `Observable` is the `subscribe` function.
+- In summary, `BehaviorSubject` is used to change the value, and `Observable` is used to subscribe to those changes.
 
 ## JWT
 

@@ -1175,3 +1175,6 @@ string hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
 ```
 
 Then, store the `hashPassword` in our database. Never store the plain text password.
+
+
+## JWT
