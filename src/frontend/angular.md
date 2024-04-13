@@ -456,7 +456,7 @@ The template variable, `#phone`, declares a `phone` variable with the `<input>` 
 
 ## Angular Forms
 
-Angular provides two different approaches to handling user input through forms: reactice and template-driven. Both capture user input events from the view, validate the user input, create a form model and data model to update, and provide a way to track changes.
+Angular provides two different approaches to handling user input through forms: reactive and template-driven. Both capture user input events from the view, validate the user input, create a form model and data model to update, and provide a way to track changes.
 
 ### Template-driven Forms:
 
@@ -549,6 +549,8 @@ export class SignupComponent {
 - In Angular's Reactive Forms, `form.controls` is a property that returns an object containing all the `FormControl` instances in the `FormGroup`.
 
 - **Notice: In the `Validators` class in Angular, the methods for minimum and maximum length validation are `minLength` and `maxLenth`, respectively. However, when accessing these validation errors in the `errors` object of a form control, they are all lowercase: `minlength` and `maxlength`. When checking for these validation errors, we should use `form.controls.password.errors?.['minlength']` and `form.controls.password.errors?.['maxlength']`**
+
+- **Important:** to change the property value in Reactive form, `this.form.value` **returns a snapshot of the current values of the form controls. It's not a reference to the actual form control values.** So simply changes to `this.form.value` won't affect the actual form control values. To change the value of a form control, we should use the `setValue` method of the `formControl` instance. These methods update the actual form control value, not just the snapshot of the value.
 
 3. **Associate the `FormGroup` model and view**:
    A form group tracks the status and changes for each of its controls, so if one of the controls changes, the parent control also emits a new status or value change. The model for the group is maintained from its members. After we define the model, we must update the template to reflect the model in the view.
