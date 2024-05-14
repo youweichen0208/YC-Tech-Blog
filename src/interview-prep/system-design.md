@@ -39,7 +39,7 @@ A proximity service is used to discover nearby places such as restaurants, hotel
 2. Data privacy: Location info is sensitive data.
 3. High availability and scalability: we should ensure our system can handle the spike in traffic during peak hours in densely populated areas.
 
-## Propose High-Level Design and Get Buy-in
+### Propose High-Level Design and Get Buy-in
 
 ### Data Model:
 
