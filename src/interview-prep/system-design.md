@@ -135,7 +135,7 @@ Caching is most beneficial when our application performs frequent read operation
 
 #### Get Nearby Businesses:
 
-1. The client sentds the user location and radius to the load balancer.
+1. The client sents the user location and radius to the load balancer.
 2. The load balancer forwards the request to the LBS.
 3. Based on the user location and radius info, the LBS finds the geohash length that matches the search.
 4. LBS calculates neighboring geohashes and adds them to the list.
