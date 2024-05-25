@@ -440,126 +440,264 @@ class Program
 - `Skip(itemsToSkip)` is used to skip the specified number of elements(items to skip), which is calculated based on the page number and page size.
 - `Take(pageSize)` is used to take the specified number of elements(page size) from the skipped position.
 
-## IEnumerable vs. IQueryable
+## Basic LINQ Operations on Strings
 
-### IEnumerable
-
-`IEnumerable` is the most basic interface for iterating over a collection of objects. It is part of the System.Collections namespace. Operations on `IEnumerable` are performed in-memory, meaning that data is loaded into memory before any operations are executed. Suitable for in-memory collections such as arrays, lists, or collections where data is already in memory.
-
-### IQueryable
-
-`IQueryable` is part of the System.Linq namespace. Operations on `IQueryable` are typically not executed immediatley. They are deferred until the data is actually needed. Suitable for querying remote data sources or databases where queries can be translated into optimized queries for underlying data store.
-
-### Key Differences:
-
-1. `IEnumerable` executes queries in-memory, while `IQueryable` allows for deferred execution and query translation.
-2. Use `IEnumerable` for in-memory collections or scenarios where data is already in memory. Use `IQueryable` when querying external data sources or databases.
-
-## Extension Methods:
-
-Extension methods are a feature in C# that allows us to add new methods to existing types without modifying them. Extension methods are defined as static methods in static classes, and they are called in a way that looks like instance methods of the extended type.
-
-### Examples of Built-in Extention Methods:
-
-1. LINQ Methods:
-
-- LINQ provides numerous extension methods for querying collections.
+1. **Filtering Strings**
+   We can use the `Where` method to filter strings based on a condition
 
 ```csharp
-// Example: Where is an extension method on IEnumerable<T>
-var filteredList = myList.Where(item => item > 5);
-```
+string[] words = { "apple", "banana", "cherry", "date" };
+var result = words.Where(word => word.StartsWith("a"));
 
-2. String Methods:
-
-- The `string` class has several extension methods for common
-
-```csharp
-// Example: ToUpper is an extension method on string
-string upperCaseString = myString.ToUpper();
-
-```
-
-## Creating Custom Extension Methods:
-
-1. Create a Static class
-2. Define the static Extension Method. The first parameter of the method specifies the type being extended, MUST BE preceded by `this` keyword.
-
-```csharp
-public static class MyExtensions
+foreach (var word in result)
 {
-    public static string Reverse(this string input)
+    Console.WriteLine(word);  // Output: apple
+}
+
+```
+
+2. **Transforming Strings**
+   The `Select` method is used to project each element of a sequence into a new form.
+
+```csharp
+string[] words = { "apple", "banana", "cherry" };
+var result = words.Select(word => word.ToUpper());
+
+foreach (var word in result)
+{
+    Console.WriteLine(word);  // Output: APPLE, BANANA, CHERRY
+}
+
+```
+
+3. **Sorting Numbers**
+
+- Sorting in Ascending Order
+
+```csharp
+using System;
+using System.Linq;
+
+public class HelloWorld
+{
+    public static void Main(string[] args)
     {
-        char[] charArray = input.ToCharArray();
-        Array.Reverse(charArray);
-        return new string(charArray);
+        int[] numbers = { 5, 3, 8, 1, 2 };
+
+        // Sort in ascending order
+        var sortedNumbers = numbers.OrderBy(n => n);
+
+        Console.WriteLine("Numbers in ascending order:");
+        foreach (var num in sortedNumbers)
+        {
+            Console.WriteLine(num);
+        }
     }
 }
 
 ```
 
-## Exception:
-
-An exception is an abnormal event or error condition that occurs during the execution of a program. The `Exception` class is the base class for all the built-in exception class in .NET framework.
-
-### Exception Handling in C#:
-
-C# provides built-in support to handle the exception using `try`, `catch`, & `finally` blocks.
+- Sorting in descending order
 
 ```csharp
-try {
-    //
-}
-catch {
+using System;
+using System.Linq;
 
-}
-finally {
+public class HelloWorld
+{
+    public static void Main(string[] args)
+    {
+        int[] numbers = { 5, 3, 8, 1, 2 };
 
+        // Sort in descending order
+        var sortedNumbers = numbers.OrderByDescending(n => n);
+
+        Console.WriteLine("Numbers in descending order:");
+        foreach (var num in sortedNumbers)
+        {
+            Console.WriteLine(num);
+        }
+    }
 }
 ```
 
-- **try block**: Any suspected code that may raise exceptions should be put inside a `try{ }` block. If an exception occurs, the flow of the control jumps to the first matching `catch` block
+4. **Aggregating Numbers**
 
-- **catch block**: The `catch` block is an exception handler block where we can perform some action such as logging and auditing an exception.
-
-- **finally block**: The `finally` block is an optional block and should come after a `try` or catch block. The `finally` block will always be executed whether or not an exception occurred. **The finally block generally used for cleaning-up code e.g., disposing of unmanaged objects.**
-
-### Throwing Exceptions:
-
-We can manually throw exceptions using the `throw` keyword
+- `Sum`: it calculates the total sum of the elements in a collection.
 
 ```csharp
-public int Divide(int numerator, int denominator)
+using System;
+using System.Linq;
+
+public class HelloWorld
 {
-    if (denominator == 0)
+    public static void Main(string[] args)
     {
-        throw new DivideByZeroException("Denominator cannot be zero.");
+        int[] numbers = { 5, 3, 8, 1, 2 };
+
+        int sum = numbers.Sum();
+        Console.WriteLine($"Sum: {sum}");  // Output: Sum: 19
     }
-    return numerator / denominator;
 }
 
 ```
 
-### Custom Exceptions:
-
-We can create our own custom exception classes by inheriting from the `Exception` class.
+- `Average`: it calculates the average value of the elements in a collection.
 
 ```csharp
-public class CustomException : Exception
+using System;
+using System.Linq;
+
+public class HelloWorld
 {
-    public CustomException(string message) : base(message)
+    public static void Main(string[] args)
     {
+        int[] numbers = { 5, 3, 8, 1, 2 };
+
+        double average = numbers.Average();
+        Console.WriteLine($"Average: {average}");  // Output: Average: 3.8
     }
 }
 
-// Usage
-try
+```
+
+- `Max`: it finds the maximum value in a collection
+
+```csharp
+using System;
+using System.Linq;
+
+public class HelloWorld
 {
-    throw new CustomException("This is a custom exception.");
+    public static void Main(string[] args)
+    {
+        int[] numbers = { 5, 3, 8, 1, 2 };
+
+        int max = numbers.Max();
+        Console.WriteLine($"Max: {max}");  // Output: Max: 8
+    }
 }
-catch (CustomException ex)
+
+```
+
+- `Min`: it finds the minimum value in a collection
+
+```csharp
+using System;
+using System.Linq;
+
+public class HelloWorld
 {
-    Console.WriteLine(ex.Message);
+    public static void Main(string[] args)
+    {
+        int[] numbers = { 5, 3, 8, 1, 2 };
+
+        int min = numbers.Min();
+        Console.WriteLine($"Min: {min}");  // Output: Min: 1
+    }
 }
+
+```
+
+- `Count`: it counts the number of elements in a collection.
+
+```csharp
+using System;
+using System.Linq;
+
+public class HelloWorld
+{
+    public static void Main(string[] args)
+    {
+        int[] numbers = { 5, 3, 8, 1, 2 };
+
+        int count = numbers.Count();
+        Console.WriteLine($"Count: {count}");  // Output: Count: 5
+    }
+}
+
+```
+
+- `Aggregating with aggregation function`: applies the aggregation function
+
+```csharp
+using System;
+using System.Linq;
+
+public class HelloWorld
+{
+    public static void Main(string[] args)
+    {
+        int[] numbers = { 5, 3, 8, 1, 2 };
+
+        // Calculate the product of all numbers
+        int product = numbers.Aggregate((acc, n) => acc * n);
+        Console.WriteLine($"Product: {product}");  // Output: Product: 240
+
+        // Calculate a custom aggregation, e.g., sum of squares
+        int sumOfSquares = numbers.Aggregate(0, (acc, n) => acc + n * n);
+        Console.WriteLine($"Sum of Squares: {sumOfSquares}");  // Output: Sum of Squares: 103
+    }
+}
+
+```
+
+## Advanced LINQ Operations on Strings
+
+1. **Grouping Strings**
+   We can group strings based on a key selector function using the `GroupBy` method.
+
+```csharp
+string[] words = { "apple", "apricot", "banana", "cherry", "blueberry" };
+var result = words.GroupBy(word => word[0]);
+
+foreach (var group in result)
+{
+    Console.WriteLine($"Words that start with {group.Key}:");
+    foreach (var word in group)
+    {
+        Console.WriteLine(word);
+    }
+}
+// Output:
+// Words that start with a:
+// apple
+// apricot
+// Words that start with b:
+// banana
+// blueberry
+// Words that start with c:
+// cherry
+```
+
+2. **Finding Elements**
+   We can use `First`, `FirstOrDefault`, `Last`, `LastOrDefault`, `Single`, or `SingleOrDefault` to find elements that match a condition.
+
+- `First`: returns the first element of a sequence that satisfies a specified condition or simply and will throw exception if no condition is satisfied.
+- `FirstOrDefault`: returns the first element of a sequence, or a default value if the sequence is empty.
+- `Single`: returns the only element of a sequence that satisfies a specific condition and will throw exception if empty sequence or multiple matches.
+- `SingleOrDefault`: return the only element of a sequence that satisfies a specified condition. It differs from `Single` in that it doesn't throw an exception if the sequence is empty or if no element matches the condition. However, like `Single`, it does throw an exception if more than one element satisfies the condition.
+
+```csharp
+string[] words = { "apple", "banana", "cherry" };
+var firstWord = words.FirstOrDefault(word => word.StartsWith("b"));
+
+Console.WriteLine(firstWord);  // Output: banana
+
+```
+
+3. **Checking for Existence**:
+   The `Any` and `All` methods can be used to check for the existence of elemenets that satisfy a condition.
+
+- `Any`: determines whether any elements in a sequence satisfy a specified condition.
+- `All`: determines whether all elements in a sequence satisfy a specified condition.
+
+```csharp
+string[] words = { "apple", "banana", "cherry" };
+bool anyWordStartsWithB = words.Any(word => word.StartsWith("b"));
+bool allWordsContainA = words.All(word => word.Contains("a"));
+
+Console.WriteLine(anyWordStartsWithB);  // Output: true
+Console.WriteLine(allWordsContainA);    // Output: false
 
 ```

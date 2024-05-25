@@ -438,3 +438,127 @@ numbers.Add(10);       // Adding an integer
 ## Explain the concept of "generics" in C#?
 
 Generics is a feature in C# that allows the creation of classes, interfaces, and methods that can work with any data type. This allows for a more flexible and reusable code.
+
+## IEnumerable vs. IQueryable
+
+### IEnumerable
+
+`IEnumerable` is the most basic interface for iterating over a collection of objects. It is part of the System.Collections namespace. Operations on `IEnumerable` are performed in-memory, meaning that data is loaded into memory before any operations are executed. Suitable for in-memory collections such as arrays, lists, or collections where data is already in memory.
+
+### IQueryable
+
+`IQueryable` is part of the System.Linq namespace. Operations on `IQueryable` are typically not executed immediatley. They are deferred until the data is actually needed. Suitable for querying remote data sources or databases where queries can be translated into optimized queries for underlying data store.
+
+### Key Differences:
+
+1. `IEnumerable` executes queries in-memory, while `IQueryable` allows for deferred execution and query translation.
+2. Use `IEnumerable` for in-memory collections or scenarios where data is already in memory. Use `IQueryable` when querying external data sources or databases.
+
+## Extension Methods:
+
+Extension methods are a feature in C# that allows us to add new methods to existing types without modifying them. Extension methods are defined as static methods in static classes, and they are called in a way that looks like instance methods of the extended type.
+
+### Examples of Built-in Extention Methods:
+
+1. LINQ Methods:
+
+- LINQ provides numerous extension methods for querying collections.
+
+```csharp
+// Example: Where is an extension method on IEnumerable<T>
+var filteredList = myList.Where(item => item > 5);
+```
+
+2. String Methods:
+
+- The `string` class has several extension methods for common
+
+```csharp
+// Example: ToUpper is an extension method on string
+string upperCaseString = myString.ToUpper();
+
+```
+
+## Creating Custom Extension Methods:
+
+1. Create a Static class
+2. Define the static Extension Method. The first parameter of the method specifies the type being extended, MUST BE preceded by `this` keyword.
+
+```csharp
+public static class MyExtensions
+{
+    public static string Reverse(this string input)
+    {
+        char[] charArray = input.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
+    }
+}
+
+```
+
+## Exception:
+
+An exception is an abnormal event or error condition that occurs during the execution of a program. The `Exception` class is the base class for all the built-in exception class in .NET framework.
+
+### Exception Handling in C#:
+
+C# provides built-in support to handle the exception using `try`, `catch`, & `finally` blocks.
+
+```csharp
+try {
+    //
+}
+catch {
+
+}
+finally {
+
+}
+```
+
+- **try block**: Any suspected code that may raise exceptions should be put inside a `try{ }` block. If an exception occurs, the flow of the control jumps to the first matching `catch` block
+
+- **catch block**: The `catch` block is an exception handler block where we can perform some action such as logging and auditing an exception.
+
+- **finally block**: The `finally` block is an optional block and should come after a `try` or catch block. The `finally` block will always be executed whether or not an exception occurred. **The finally block generally used for cleaning-up code e.g., disposing of unmanaged objects.**
+
+### Throwing Exceptions:
+
+We can manually throw exceptions using the `throw` keyword
+
+```csharp
+public int Divide(int numerator, int denominator)
+{
+    if (denominator == 0)
+    {
+        throw new DivideByZeroException("Denominator cannot be zero.");
+    }
+    return numerator / denominator;
+}
+
+```
+
+### Custom Exceptions:
+
+We can create our own custom exception classes by inheriting from the `Exception` class.
+
+```csharp
+public class CustomException : Exception
+{
+    public CustomException(string message) : base(message)
+    {
+    }
+}
+
+// Usage
+try
+{
+    throw new CustomException("This is a custom exception.");
+}
+catch (CustomException ex)
+{
+    Console.WriteLine(ex.Message);
+}
+
+```
