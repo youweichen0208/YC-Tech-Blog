@@ -1176,5 +1176,8 @@ string hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
 Then, store the `hashPassword` in our database. Never store the plain text password.
 
+### Improve performance on the API side of the application
 
-## JWT
+- We looked into our tables and see what data/tables that are same and don't change often and we cached that data in memory. We used .NET Core In Memory Caching mechanism for this. For large amount of data that needs to be cached we used Redis caching.
+- We made sure we use async/await for our API Controllers that talk with database when we use EF's async methods.
+- We consider handling long-running requests with background services or out of process with an Azure function.
