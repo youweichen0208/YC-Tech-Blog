@@ -28,9 +28,9 @@ OpenID is an authentication protocol that allows users to log in to multiple web
 - Single sign-on (SSO) for web applications.
 - Simplying user management by leveraging existing credentials from trusted providers.
 
-## What is OAth
+## What is OAuth
 
-OAth is an authorization protocol that allows third-party applications to access a user's resources without sharing the user's credentials.
+OAuth is an authorization protocol that allows third-party applications to access a user's resources without sharing the user's credentials.
 
 ### How It Works
 
@@ -43,7 +43,7 @@ OAth is an authorization protocol that allows third-party applications to access
 
 ### SOLID Principle:
 
-The SOLID principles are a set of five design principles in software development that are aimed at making software designs more understandable, flexible, and maintainable. The excerpt from the active file does not provide details on the SOLID principles.
+The SOLID principles are a set of five design principles in software development that are aimed at making software designs more understandable, flexible, and maintainable.
 
 1. **Single Responsiblity Principle:**
 
