@@ -18,6 +18,18 @@ tag:
 
 Kestrel is a cross-platform, lightweight, and open-source web server developed by Microsoft. It is the default web server used by ASP.NET Core applications. Kestrel is designed to be fast, efficient, and scalable, making it suitable for hosting modern web applications.
 
+## Explain the difference between .NET framework and .NET (Core).
+
+- Platform Support:
+  - **.NET Framework** is designed to run only on Windows platforms.
+  - .NET Core is a cross-platform framework that can run on Windows, macOS, and Linux.
+- Modularity and Performance:
+  - **.NET Framework** provides a comprehensive API set in a single package, which can be more than what is needed for many applications.
+  - **.NET Core** is designed to be modular, allowing developers to include the neccessary packages for their application.
+- Open Source:
+  - **.NET Core** is open source, with its runtime, libraries, compiler, and other components available on Github.
+  - **.NET Framework** is primarily developed by Microsoft.
+
 ## Entry Point of .NET Core Application
 
 By default, Program.cs file in ASP.NET Core MVC application is an entry point of an application. It contains logic to start the server and listen for the requests and also configure the application.
@@ -60,39 +72,45 @@ view in MVC is a user interface. View display model data to the user and also en
 
 the controller handles the user request. Typically, the user uses the view and raises an HTTP request, which will be handled by the controller. The controller processes the request and returns the appropriate view as a response. In other words, controller is the request handler.
 
-## Routing in MVC
+## What are the differences between ASP.NET Core MVC and Web API?
 
-ASP.NET introduced Routing to eliminate the needs of mapping each URL with a physical file. Routing enables us to define a URL pattern that maps to the request handler. This request handler can be a file or class. For example, http://domain/students can be mapped to http://domain/studentsinfo.aspx in ASP.NET webforms, and the same URL can be mapped to Student Controller and Index action method in MVC.
+- **Use Case**: MVC is best for web applications with complex UIs that render server-side. Web API is best for building RESTful services where the client handles the UI.
+- **View Engine**: MVC can use the Razor view engine to generate HTML. Web API is designed to work without a view engine, returning data in a specified format.
+- **Client Support**: Web API supports a broader range of clients, including mobile apps, desktop applications, and other web services. MVC is primarily for web browswers.
 
-### URL pattern
+## How do you handle routing in asp.net core application?
 
-- **URL Pattern**:
-  In ASP.NET Core, we define routes using URL patterns. These patterns can include placeholders for values that will be filled in with data from the actual URL.
+Handling routing in an ASP.NET Core application involves defining URL patterns that the application responds to ASP.NET Core supports two primary types of routing: conventional routing and attribute routing.
 
-- **After the Domain Name**:
-  The URL pattern is applied to the part of the URL that comes after the domain name (and port number, if specified). For example, in the URL `http://localhost:1234/Products/Details/5`, the domain name is `localhost:1234` and the rest (`Products/Details/5`) is where the URL pattern is applied.
+### Conventional Routing:
 
-- **Example**:
-  The text provides an example of a URL pattern: `{controller}/{action}/{id}`. In this pattern, `{controller}` is a placeholder for the name of the controller, `{action}` is a placeholder for the name of the action method, and `{id}` is a placeholder for an optional id parameter.
+Conventional routing is typically defines in the `program.cs` file of an ASP.NET Core application and is used primarily with controllers and actions in MVC applications. It involves setting up route templates with placeholders that are replaced by the actual values in a URL when a request is made.
 
-- **Controller**:
-  According to the given pattern, anything after `localhost:1234/` in the URL is considered as the controller name. For example, in the URL `http://localhost:1234/Products/Details/5`, `Products` is the controller name.
+### Attribute Routing:
 
-### Configure routing for MVC controllers in an ASP.NET Core application:
+Attribure routing uses attributes to define routes directly on controllers and actions. This provides more control over the URIs in our web application.
 
-We can configure a general pattern of routing in the `Program.cs` file after .NET 6.
+- Controller-Level Routing:
+  Apply the `[Route]` attribute to a controller to define a base route for all actions within that controller.
+  ```csharp
+  [Route("api/[controller]")]
+  public class ProductsController : ControllerBase
+  {
+  }
+  ```
+- Action-Level Routing:
+  Apply the `[Route]` or `[HttpGet]`, `[HttpPost]`, etc., attributes to action methods to define specific routes.
+  ```csharp
+  [HttpGet("{id}")]
+  public IActionResult GetProduct(int id)
+  {
+    // Implementation
+  }
+  ```
 
-```csharp
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-```
+### Differences between conventional routing and attribute routing:
 
-- `"default"`: This is the name of the route. Naming routes is optional, but it can be useful for generating URLs later.
-- `{controller=Home}/{action=Index}/{id?}`: this is the route template. It defines the pattern for the URLs that this route will match. The placeholders `{controller}`, `{action}`, and `{id}` are replaced with actual values from the incoming URL.
-  - `{controller=Home}`: This segment matches the controller part of the URL. The `=Home` part specifies that if no controller is specified in the URL, it should default to `Home`.
-  - `{action=Index}`: This segment matches the action method part of the URL. The `=Index` part specifies that if no action is specified in the URL, it should default to `Index`.
-  - `{id?}`: This segment matches an optional id parameter in the URL. The `?` makes it optional.
+Conventional routing is best suited for applications with a uniform URL structure that benefits from centralized route management. In contrast, attribute routing offers more flexibility and control, making it ideal for applications, such as APIs, that require complex or custom URL patterns.
 
 ### Points to remember:
 
@@ -444,6 +462,151 @@ The uer interface layer in an ASP.NET Core MVC application is the entry point fo
 - Custom Middleware
 - Views, Partial Views & View Components
 - Startup/Program.cs
+
+## Middleware
+
+### Explain middleware in ASP.NET Core and its functionalities
+
+1. `Request Handling`:
+   Middleware components inspect and act on incoming HTTP requests. They can modify the request, perform operations based on the request data, or decide whether to pass the request to the next middleware in the pipeline.
+2. `Response Handling`:
+   Middleware can also modify the outgoing response, set headers, perform operations before the response is sent back the client.
+3. `Short-Circuiting the pipeline`:
+   A middleware can decide to not call the next middleware in the pipeline, effectively short-circuiting the request processing. This is useful for handling errors, authentication, authorization, and other scenarios where further processing is unnecessary or undesirable.
+4. `Dependency Injection`:
+   Middlewre in ASP.NET Core can utilize dependency injection to use services registered in the application, promoting a modular and testable design.
+
+### Examples of built-in Middleware
+
+#### **Static File Middleware:** Serves static files like HTML, CSS, JavaScript, and images.
+
+```csharp
+app.UseStaticFiles();
+```
+
+#### **Routing Middleware:**
+
+```csharp
+app.UseRouting();
+```
+
+1. **Endpoint Mapping:** It matches incoming HTTP requests to mapped endpoints. Endpoints are defined using attributes (like `[Route]`, [`[HttpGet]`, etc.]) in controllers or Razor Pages.
+2. **Use with Other Middleware**: After `app.UseRouting()`, we can use endpoint-related middleware such as `app.UseAuthorization()` and `app.UseEndpoints()`. This allows for a clear separation of concerns where routing decisions are made first, followed by authorization, and finally, the execution of the matched endpoint.
+
+#### **Authentication Middleware:**
+
+```csharp
+app.UseAuthentication();
+```
+
+The `UseAuthentication` middlware ensures the authentication process happens for each request before it reaches other parts of the application, such as authorization middleware or controllers.
+
+Here's the more detailed steps of the process:
+
+1. **Request Received:**
+
+- An incoming HTTP request is received by the ASP.NET Core application.
+
+2. **UseAuthentication Middleware:**
+
+- The `UseAuthentication` middleware reads the authentication information from the request (e.g., cookie, authorization header.)
+- It delegates to the configured authentication handler (e.g., cookie authentication handler) to validate the credentials.
+
+3. **authentication Handler:**
+
+- The handler process the authentication information.
+- If the credentials are valid, the handler creates a `ClaimsPrincipal` representing the authenticated user and sets it to `HttpContext.User`.
+
+4. **UseAuthorization Middleware:**
+
+- The `UseAuthorization` middleware checks if the request meets the required authorization policies based on the authenticated user principal.
+- If the user is not authorized, it returns an appropriate response (e.g., 403 Forbidden).
+
+5. **Controller/Action:**
+
+- If authorization succeeds, the requets proceeds to the controller action.
+- The action can access the User property to get information abput the authenticated user.
+
+#### **UseExceptionHandler Middleware**:
+
+In many scenarios, using `UseExceptionHandler()` in ASP.NET Core can sufficiently handle global exceptions without needing to implement custom exception handlers.
+
+#### Implementing Custom Exception Handlers:
+
+1. Create Custom Exception Handler (Implement IExceptionHandler)
+2. Register Custom Exception Handler in dependency injection handler
+3. Integrate with Middleware Pipeline
+
+## Discuss different ways to implement authentication and authorization in ASP.NET Core
+
+### Authentication
+
+1. **Cookie-Based Authentication:**
+2. **JWT (JSON Web Tokens) Authentication:**
+3. **OAuth and OpenID Connect:** For applications that need to authenticate users through external providers like Google, Facebook, or Microsoft, ASP.NET Core supports OAuth 2.0 and OpenID Connect.
+
+#### JWT vs Cookie-Based Authentication
+
+1. **Statefulness:**
+
+- **JWT Authentication:** Stateless. JWTs contain all necessary authentication information (claims) within the token itself.
+- **Cookie-Based Authentication:** Stateful. The server maintains session state and user authentication information on the server-side, usually via session cookies stored on the client-side.
+
+2. **Use Cases:**
+
+- **JWT Authentication:** Ideal for APIs, microservices, and SPAs where stateless authentication is advantageous
+- **Cookie-Based Authentication:** Common in traditional web applications with server-side rendering and complex session management requirements.
+
+### Authorization
+
+1. **Role-Based Authorization:** This method restricts access to resources based on the user's role. It's a straightforward approach where roles are assigned to users, and access is granted or denied based on those roles.
+2. **Policy-Based Authorization:** It offers more flexibility than role-based authorization by allowing the definition of policies with one or more requirements.
+
+3. **Claims-Based Authorization:** This method checks for the presence of specific claims in the user's identity. Claims are key-value pairs associated with a user and can represent a wide range of data.
+
+## How do you configure CORS(Cross-Origin Resource Sharing) in ASP.NET Core?
+
+Configuring CORS (Cross-Origin Resource Sharing) in ASP.NET Core allows us to specify which domains can access our resources from a different origin. we can define CORS policy in the `program.cs` file and use `UseCors()` middleware with defined policy name for each request.
+
+## Explain model binding and validation in ASP.NET Core MVC.
+
+In ASP.NExplain model binding and validation are fundamental concepts that ensure incoming data from HTTP requests is correctly mapped to model objects and validated against defined rules before processing.
+
+### Model Binding
+
+**Model Binding** is the process of mapping data from HTTP requests to object properties. When a client sends a request(e.g. a form submission), the model binding system takes the incoming data, tries to find a match for each action method parameter, and converts the data to the appropriate type.
+
+```csharp
+public class UserModel
+{
+    public string Username { get; set; }
+    public string Email { get; set; }
+    public int Age { get; set; }
+}
+```
+
+### Model Validation
+
+**Model Validation** ensures that data adheres to certain rules before it's processed further. It includes:
+
+1. **Data Annotations:** Validation rules are specified using data annotation attributes on model properties, such as `[Required]`. `[StringLength]`, `[Range]`, and custom validation attributes.
+
+```csharp
+public class UserModel
+{
+    [Required]
+    public string Username { get; set; }
+
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
+
+    [Range(18, 120)]
+    public int Age { get; set; }
+}
+```
+
+2. **Validation Attributes:** ASP.NET Core MVC attributes like `[Required]`, `[Range]`, `[RegularExpression]`, etc., to validate incoming data based on these annotations.
 
 ## Dependency Injection:
 
@@ -1181,3 +1344,36 @@ Then, store the `hashPassword` in our database. Never store the plain text passw
 - We looked into our tables and see what data/tables that are same and don't change often and we cached that data in memory. We used .NET Core In Memory Caching mechanism for this. For large amount of data that needs to be cached we used Redis caching.
 - We made sure we use async/await for our API Controllers that talk with database when we use EF's async methods.
 - We consider handling long-running requests with background services or out of process with an Azure function.
+
+## How do you implement caching in an ASP.NET Core application?
+
+1. **In-Memory Caching** stores data within the memory of the web server. It's simple to use but local to the server, making it suitable for single-server or lightweight applications.
+2. **Distributed Caching** is useful in multi-server or cloud environments, allowing applications to share a cache across intances. Common distributed cache stores include Redis and SQL Server.
+3. **Response Caching** adds cache-related headers to HTTP responses. This can instruct clients or proxies to cache the response data.
+
+## Discuss logging mechanisms available in ASP.NET Core.
+
+Logging mechanisms in ASP.MET Core allow developers to capture information about the application's runtime behavior, errors, and custom events. This information is crucial for debugging, monitoring, and auditing the application's health and performance. Here is the overview of logging mechanisms in ASP.NET Core:
+
+1. Built-in Logging Providers
+
+- **Console**: Logs to the console.
+- **Debug**: Logs to the debug output window.
+- **EventSource**: Logs to EventSource.
+
+2. Third-party Logging Providers
+   ASP.NET Core supports third-party logging providers:
+
+- **Serilog**: A popular structured logging library.
+- **NLog**: A flexible and free logging platform.
+- **Log4Net**: A port of the popular Log4J library to .NET.
+
+3. Log Levels:
+   ASP.NET Core supports various log levels:
+
+- **Trace**: Logs that contain the most detailed messages.
+- **Debug**: Logs that are used for investigation during development
+- **Information**: Logs that track the general flow of the application.
+- **Warning**: Logs that highlight an abnormal or unexpected event in the application flow.
+- **Error**: Logs that highlight when the current flow of execution is stopped due to a failure.
+- **Critical**: Logs that describe an unrecoverable application or system crash.

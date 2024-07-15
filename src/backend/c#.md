@@ -8,7 +8,7 @@ tag:
   - .net
 ---
 
-# C# and .NET CORE
+# C#
 
 ## Common Type System
 
@@ -25,6 +25,14 @@ tag:
 3. Value types will not be collected by garbage collector; reference types will be collected by garbage collector.
 4. Value types can be created by struct or enum while reference type can be created by class, interface, delegate or array.
 5. Value types can not accept any null values while reference types can accept null values.
+
+## What are the benefits of using C# as a programming language?
+
+1. type safety
+2. object-oriented
+3. cross-platform
+4. rich library support
+5. can be used in multiple applications including web applications, desktop applications, and mobile applications.
 
 ## How to differentiate value types and reference types:
 
@@ -173,9 +181,9 @@ string result = sb.ToString();
 
 - String is in System namespace but StringBuilder is in System.Text namespace.
 
-## Garbage Collection
+## Explain garbage collection in .NET and how it works
 
-Garbage collection in C# is a process that automatically reclaims memory that was allocated by our program and is no longer in use. It's a part of the .NET runtime and is automatically performed as our program runs.
+Garbage collection in .NET is a form of automated memory management. When our program creates new objects, they are allocated on the managed heap. The garbage collector periodicall checks which objects in the heap are still being used by the application and mark alive and not alive objects. Then the garbage collector will deallocate memory occupied by the objects that were not marked as alive.
 
 ## Acess Modifiers:
 
@@ -435,6 +443,43 @@ numbers.Add(10);       // Adding an integer
 - **No Boxing and Unboxing**:
   - Generic collections avoid the need for boxing and unboxing, resulting in better performance when working with value types.
 
+## Discuss different types of collections in C# and their use cases.
+
+1. `Arrays`
+
+- Fixed-size collections of a single data type
+- Use case: when we have a known quantity of elements and do not need to add or remove items after the array is created.
+
+2. `List<T>`
+
+- Resizable arrays that can grow and shrink
+- Use case: when we need a dynamic array that can change size, with frequent additions and removals of elements.
+
+3. `Dictionary<TKey, TValue>`
+
+- Collection of key-value pairs with fast lookups based on the key
+- Use case: when we need to access elements by a specific key, such as a lookup table or a cache.
+
+4. `HashSet<T>`
+
+- Unordered collection of unique elements.
+- Use case: when we need to ensure no duplicates are present and order is not important
+
+5. `Queue<T>`
+
+- First-in, first-out collection
+- Use Case: when we need to process items in the order they were added, such as task scheduling
+
+6. `Stack<T>`
+
+- Last-in, first-out collection
+- Use Case: when we need to access items in reverse order of their addition, such as unto mechanisms in applications.
+
+7. `LinkedList<T>`
+
+- Doubly linked list that allows fast insertion and removal of elements.
+- Use Case: When we need efficient insertions and deletions from anywhere in the list.
+
 ## Explain the concept of "generics" in C#?
 
 Generics is a feature in C# that allows the creation of classes, interfaces, and methods that can work with any data type. This allows for a more flexible and reusable code.
@@ -519,7 +564,7 @@ finally {
 
 - **try block**: Any suspected code that may raise exceptions should be put inside a `try{ }` block. If an exception occurs, the flow of the control jumps to the first matching `catch` block
 
-- **catch block**: The `catch` block is an exception handler block where we can perform some action such as logging and auditing an exception.
+- **catch block**: The `catch` block is an exception handler block where we can perform some action such as get the details about the exception
 
 - **finally block**: The `finally` block is an optional block and should come after a `try` or catch block. The `finally` block will always be executed whether or not an exception occurred. **The finally block generally used for cleaning-up code e.g., disposing of unmanaged objects.**
 
@@ -562,3 +607,46 @@ catch (CustomException ex)
 }
 
 ```
+
+## What are the async/await keywords used for in C#?
+
+The `async` and `await` keywords in C# are used for asynchronous programming. They enable the compiler to generate code that allows methods to run asynchronously.
+
+## Explain Dependency Injection(DI) and its benefits.
+
+Dependency injection is a design pattern used to achieve inversion of control between classes and their dependencies. It involves providing the objects that an object needs rather than having it contruct them itself. DI can be implemented in several ways, including constructor injection, property injection, and method injection.
+
+### Benefits of dependency injection
+
+1. `Loose coupling`: DI reduces the coupling between classes, making them less dependent on each other. This makes the system more modular, easier to understand, and easier to manage.
+
+2. `Enhanced Testability`: With DI, it's easier to replace dependencies with mocks or stubs for testing, which significantly improves the testability of the code.
+
+3. `Improved Code Maintenance`: Changes in dependencies or their configurations have minimal impact on the classes that use them
+
+4. `Increased Flexibility and Scalability`: DI makes it easier to change an application's behavior by replacing modules or services without altering the classes that use them.
+
+5. `Better Code Readability`: With dependencies explicitly required by constructors or methods, it becomes clearer what dependencies a class has, improving readability.
+
+## Discuss different types of inheritance in C#
+
+1. Single Inheritance
+   Single inheritance is when a class inherits from only one base class. This is the simplest and most common form of ineritance
+
+2. Multi-Level Inheritance
+   Multi-level inheritance occurs when a class is derived from a class that is also derived from another class, creating a chain of inheritance.
+
+3. Hierarchical Inheritance
+   Hierarchical inheritance occurs when multiple classes inherit from a single base class. This is useful for creating different implementations of the same base functionality.
+
+4. Multiple Inheritance (via interfaces)
+   C# does not support multiple inheritance with classes to avoid complexity and ambiguity. However, C# supports multiple inheritance through interfaces, allowing a class to implement multiple interfaces.
+
+## How do you implement unit testing in .NET project?
+
+- unit testing:
+  1. We first install necessary test framework(xUnit, NUnit)
+  2. Write unit tests. Use `[TestClass]` attribte to denote a test class and `[TestMethod]` for test methods.
+  3. Use assertions. Within each test method, use assertions to validate the behavior of our application.
+- Mocking dependencies
+  For more complex scenarios, where our classes have dependencies(services, databases), we can use mocking frameworks like Moq to create mock objects for unit testing.
