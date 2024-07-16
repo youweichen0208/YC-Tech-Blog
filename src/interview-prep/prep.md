@@ -216,3 +216,21 @@ var entity = DbContext.
 
 1. `AsNoTracking()`: This method is used to tell Entity Framework not to track the changes to the returned entity. This means that EF won't keep information about the entity instance in its chaneg tracker.
 2. `Inlcude(p=>p.Content)`: This method is used to specify related data to be included in the query results.
+
+## Introduce yourself
+
+My name is Adam. I am a full stack developer with .NET for backend services and Angular for the frontend. I love building smooth and scalable applications and have focused my career on mastering these technologies. I enjoy solving complex problems, bringing ideas to life, and continously learning to stay updated with tech trends.
+
+I am also good at communicating and working with others. I believe that a team with good communication can always lead to success. I like to share ideas and listen to other teammates' user stories in the scrum meeting. I am a hard working person. My priority is to ensuring that the projects are done efficiently and effectively within the schedule.
+
+## Explain your most recent project and its architecture?
+
+The most project I worked on is using the clean architecture. The clean architecture has 3 different layers: application layer, infrastructure layer, and API layer. The application layer holds the business model such as entities and services. Infrastructure layer includes data access implementations such as using Entity Framework. API layer is the entry point of the application. It has controllers, filters and middleware. Compared to the traditional MVC model that business layer depends on the data access layer, the data access layer and API layer both relies on the application layer. The reason that we chose to use clean architecture is because it is more scalable and the core business logic is independent of frameworks. The project has multiple microservices such as telemetry service and simulation service. Some of the microservices are interdependent. So clean architecture will ensure that it provides a boundary between different concerns within the service and allow each service to scale independently.
+
+## When should we use Promises vs Observables
+
+Promises are ideal for one-time events or asychronous operations. Use Observables when dealing with a stream of data that arrives over time.
+
+## Explain normalization in a few sentences
+
+Normalizaton is to minimize redundancy and dependency by dividing the large tables into smaller ones and defining relationships between them. The main goals of normalization are to reduce data duplication, ensure data integrity, and simplify the database structure.
