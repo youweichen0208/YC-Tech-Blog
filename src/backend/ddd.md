@@ -8,6 +8,7 @@ tag:
   - DDD
 ---
 
+# DDD(Domain Driven Design)
 ## CQRS(command query responsibility segregation)
 The fundamental idea is that we should divide an object's methods into two sharply separated categories:
 1. `Queries`: return a result and do not change the observable state of the system(are free of side effects).
