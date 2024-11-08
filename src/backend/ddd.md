@@ -52,7 +52,7 @@ DDD descibes independent problem areas as Bounded Contexts(each Bounded Context 
 
 Determing where to place boundaries between Bounded Contexts balances two competing goals. Our services should handle all responsibilities related to our domain internally. But we should also ensure that communication between different bounded contexts is kept to a minimum. Too many cross-service communication introduces `complexity`, `latency`, and `failture risks`.
 
-[Layers in a Domain-Driven Design Microservice](/assets/images/domain-driven-design-microservice.png)
+![Layers in a Domain-Driven Design Microservice](/assets/images/domain-driven-design-microservice.png)
 
 
 Each layer is a VS project. Application layer is Ordering.API, Domain layer is Ordering.Domain and the Infrastructure layer is Ordering.Infrastructure.
