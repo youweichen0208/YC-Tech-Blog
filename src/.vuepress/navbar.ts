@@ -77,6 +77,15 @@ export default navbar([
     text: "Backend",
     icon: "pen-to-square",
     prefix: "/backend/",
-    children: [{ text: "Spring", icon: "pen-to-square", link: "spring" }],
+    children: [{ text: "Spring", icon: "pen-to-square", link: "spring" },
+      { text: "Azure", icon: "pen-to-square", link: "azure" },
+      { text: "DDD", icon: "pen-to-square", link: "ddd" }
+      { text: ".NET Core", icon: "pen-to-square", link: "dotnetcore" }
+      { text: "OOP", icon: "pen-to-square", link: "oop" }
+      { text: "C#", icon: "pen-to-square", link: "c#" }
+      { text: "Docker", icon: "pen-to-square", link: "docker" }
+
+    ],
+
   },
 ]);
