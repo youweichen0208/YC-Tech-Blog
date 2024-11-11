@@ -58,3 +58,34 @@ Determing where to place boundaries between Bounded Contexts balances two compet
 Each layer is a VS project. Application layer is Ordering.API, Domain layer is Ordering.Domain and the Infrastructure layer is Ordering.Infrastructure.
 
 ## Design a microservice domain model
+### Domain model structure in a custom .NET Standard Library
+![Ordering Microservice Domain Model](/assets/images/ordering-microservice-container.png)
+
+As we can see, in the domain model, there are two aggregates: the order aggregate and the buyer aggregate. Each aggregate is a group of domain entities and value objects, although we could have an aggregate compsoed of a single domain entity(the aggregate root or root entity).
+
+### Structure aggregates in a custom .NET Standard library
+An aggregate refers to a cluster of domain objects grouped together to match transactional consistency. Those objects could be instances of entities. Transactional consistency means that an aggregate is guaranteed to be consistent and up to date at the end of a business action. 
+![Order Aggregate](/assets/images/vs-solution-explorer-order-aggregate.png)
+
+### Value Object within Aggregate 
+![Value Object within Aggregate](/assets/images/value-object-within-aggregate.png)
+
+As we can see, the attribute `address` is simply a complex-value composed of country/region, street, city, etc., and has no identity in this domain, must be modeled and treated as a value object.
+
+#### Important Characteristics of Value Objects:
+- They have no identity.
+- They are immutable.
+
+The values of a value object `MUST BE` immutable once the object is created. Therefore, when the object is created, we must provide the required values, but we must not allow them to change during the object's lifetime.
+
+Value objects allow us to perform certain tricks for performance. This is especially true in systems where there may be thousands of value object instances, many of which have the same values. Their immutable nature allows them to be reused; they can be interchangeable objects, since their values are the same and they have no identity. This type of optimization can sometimes make a difference between software that runs slowly and software with good performance.
+
+
+## Domain events
+1. `Purpose`: Domain events represent something meaningful that happened within our domain/business logic(e.g., "OrderPlaced", "PaymentReceived")
+2. `Scope`: Usually handled within the same bounded context or application
+3. `Timing`: Typically synchronous and immediate within the application
+4. `State`: Immutable, representing a fact that happened at a specific point in time.
+5. `Usage`: Often used for maintaining consistency within a bounded context and updateing different parts of our application.
+
+
