@@ -1,0 +1,1 @@
+import{_ as o,o as t,c as a,a as e,b as c}from"./app-QocoGzhN.js";const r={},s=e("h1",{id:"hokiex",tabindex:"-1"},[e("a",{class:"header-anchor",href:"#hokiex","aria-hidden":"true"},"#"),c(" HokieX")],-1),i=[s];function n(_,h){return t(),a("div",null,i)}const l=o(r,[["render",n],["__file","hokiex.html.vue"]]);export{l as default};
