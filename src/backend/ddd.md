@@ -89,3 +89,52 @@ Value objects allow us to perform certain tricks for performance. This is especi
 5. `Usage`: Often used for maintaining consistency within a bounded context and updateing different parts of our application.
 
 
+## MediatR in C# to achieve CRRS 
+`MediatR` is a popular open-source library for .NET designed to simplify and decouple the communication between different parts of an application. It implements the `Mediator` design pattern, which is useful for managing complex communication by providing a centralized way to send messages, commands, or queries between objects. 
+
+### `IRequest<TResponse>`
+In MediaR, the `IRequest<TResponse>` interface is used to represent a request for data or an action, and the `TResponse` type indicates the type of the expected response. When a class implements `IRequest<TResponse>`, it is essentially marking that class as a `request` that will be handled by a corresponding `handler`. The `handler` is therefore responsible for executing the logic associated with the request and returning a response of type `TResponse`.
+
+### Queries in MediatR:
+
+```csharp
+public class GetUserQuery : IRequest<User>
+{
+    public int UserId { get; set; }
+}
+
+```
+In this example:
+- `GetUserQuery` class:
+  - This class represents a query(request for data) to get a user
+  - `UserId` can be considered as the parameters that will be encapsulated into the query 
+- `IRequest<User>`:
+  - The `IRequest<TResponse>` interface indicates that this query expects a `response of type User` when processed.
+  - In this case, `TResponse` is the `User`, meaning the result of executing this query should be a `User` object.
+   
+  ### Handler in Queries
+  ```csharp
+    public class GetUserQueryHandler : IRequestHandler<GetUserQuery, User>
+  {
+      // Example constructor injection for database service, if needed
+      private readonly IUserRepository _userRepository;
+
+      public GetUserQueryHandler(IUserRepository userRepository)
+      {
+          _userRepository = userRepository;
+      }
+
+      public async Task<User> Handle(GetUserQuery request, CancellationToken cancellationToken)
+      {
+          // Logic to fetch user from database or another data source using UserId
+          var user = await _userRepository.GetUserByIdAsync(request.UserId);
+          
+          // Return the user object
+          return user;
+      }
+  }
+
+  ```
+
+  In this example, `IRequestHandler<GetUserQuery, User>` tells the handler to handle the `GetUserQuery` query and returns `User` as the result. 
+  **SAME RULE APPLIES TO THE COMMANDS AND COMMAND HANDLERS** 
