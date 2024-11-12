@@ -95,7 +95,11 @@ Value objects allow us to perform certain tricks for performance. This is especi
 ### `IRequest<TResponse>`
 In MediaR, the `IRequest<TResponse>` interface is used to represent a request for data or an action, and the `TResponse` type indicates the type of the expected response. When a class implements `IRequest<TResponse>`, it is essentially marking that class as a `request` that will be handled by a corresponding `handler`. The `handler` is therefore responsible for executing the logic associated with the request and returning a response of type `TResponse`.
 
-### Queries in MediatR:
+### Pipeline Behavior in CQRS
+In MediatR, `Pipeline Behaviors` are a powerful feature that allows us to insert custom logic into the processing pipeline of requests(commands, queries, etc). They sit between the request being sent and the request handler, allowing us to modify or inpsect the request, response, or behavior of the system during the request's processing.
+
+
+### Queries&Commands in MediatR:
 
 ```csharp
 public class GetUserQuery : IRequest<User>
@@ -138,3 +142,77 @@ In this example:
 
   In this example, `IRequestHandler<GetUserQuery, User>` tells the handler to handle the `GetUserQuery` query and returns `User` as the result. 
   **SAME RULE APPLIES TO THE COMMANDS AND COMMAND HANDLERS** 
+
+  ### A Validation Behavior in CQRS 
+  By using a `pipeline behavior` in MediatR, we can ensure that commands and queries are validated before they are handled, providing a clean separation of concerns and keeping the business logic in the right places.
+
+  1. Define the Validator for the Command:
+     Define a `FluentValidation` validator to ensure the command's data is valid before it reaches the handler:
+
+     ```csharp
+            // Validators/User/Validators/CreateUserCommandValidator.cs
+        using FluentValidation;
+
+        public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+        {
+            public CreateUserCommandValidator()
+            {
+                RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+                RuleFor(x => x.Email)
+                    .NotEmpty().WithMessage("Email is required.")
+                    .EmailAddress().WithMessage("Invalid email format.");
+            }
+        }
+
+     ```
+
+     
+  2. Create the Validation Behavior:
+   
+   ```csharp
+        // Behaviors/ValidationBehavior.cs
+      using FluentValidation;
+      using MediatR;
+      using System.Collections.Generic;
+      using System.Linq;
+      using System.Threading;
+      using System.Threading.Tasks;
+      using Application.Exceptions;
+
+      public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+          where TRequest : IRequest<TResponse>
+      {
+          private readonly IEnumerable<IValidator<TRequest>> _validators;
+
+          public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+          {
+              _validators = validators;
+          }
+
+          public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+          {
+              var context = new ValidationContext<TRequest>(request);
+              var failures = _validators
+                  .Select(x => x.Validate(context))
+                  .SelectMany(x => x.Errors)
+                  .Where(x => x != null)
+                  .ToList();
+
+              if (failures.Any())
+              {
+                  // You can throw custom exceptions for validation failure here
+                  throw new ValidationException(failures);
+              }
+
+              return await next();
+          }
+      }
+
+   ```
+
+   - `IPipelineBehavior` is a MediatR interface that allow us to inject custom logic (like validation) into the request-handling pipeline.
+   - `Handle` intercepts the request, runs validation using the provided validators, and throws a `ValidationException` if any validation errors occur.
+   - If no validation errors are found, it calls the next delegate in the pipeline(`next()`), which leads to the handler.
+
+  3. Register Dependencies in `Program.cs`
+  4. 
