@@ -1,1 +1,0 @@
-import{_ as o,r as a,o as r,c as n,d as c,a as e,b as s}from"./app-zyqUNJI3.js";const _={},d=e("h1",{id:"intro-page",tabindex:"-1"},[e("a",{class:"header-anchor",href:"#intro-page","aria-hidden":"true"},"#"),s(" Intro Page")],-1);function i(l,m){const t=a("Aboutme");return r(),n("div",null,[d,c(t)])}const f=o(_,[["render",i],["__file","intro.html.vue"]]);export{f as default};
