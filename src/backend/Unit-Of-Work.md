@@ -113,6 +113,12 @@ public class Order
 
 ```
 
+- `Controlled Object Creation`: By setting the constructor to `private`, we prevent external code from instantiating the `Order` object directly. This means that the only way to 
+create an `Order` object is through the static `Create` method, which ensures that the object is always created in a valid state.
+
+- The `Create` method acts as a factory that enforces domain rules when constructing the `Order`. For example, it ensures that the `Customer` is provided, and the `OrderNumber` is valid when creating the object. This guarantees that an `Order` cannot be created in an incomplete or inconsistent state, which could happen if a public constructor where used.
+
+
 **OrderItem class**
 
 ```csharp
@@ -138,6 +144,8 @@ public class OrderItem
     }
 }
 ```
+
+
 
 ### interfaces
 

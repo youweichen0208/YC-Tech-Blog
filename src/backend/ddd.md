@@ -215,4 +215,8 @@ In this example:
    - If no validation errors are found, it calls the next delegate in the pipeline(`next()`), which leads to the handler.
 
   3. Register Dependencies in `Program.cs`
-  4. 
+
+
+## Richer Domain Model:
+A Rich Model is a design pattern where business logic is encapsulated within domain entities. These entities contain both data and behavior, ensuring business rules are enforced consisntently.
+
