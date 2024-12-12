@@ -11,19 +11,207 @@ sticky: true
 
 # MySQL interview questions:
 
-## 1. What is the MySQL server's default port?
+## 什么是主键和外健
 
-3306 is MySQL server's default port.
+- 主键：主键是一个表中用来唯一标识每一条记录的列。主键的值必须是唯一的，不能为 null。
+- 外健：外健是一个表中的一列， 用于建立与另一个表的关联关系。外健列的值可以是 null，但在非空情况下，它的值必须在被关联表的主键中存在。
 
-## 2. What are the differences between CHAR and VARCHAR data types in MySQL?
+### 主键与外健的关系：
 
-### CHAR:
+- 主键是外健的参照： 外健通常指向另一个表的主键，形成主从关系。在一个表中作为外健的列值必须在另一个表中作为主键的列中存在。
+- 建立关联： 通过外健，能够在不同表之间建立逻辑关联，方便进行复杂查询
 
-1. This data type is used to store character strings of a fixed length. The length can be specified in the parentheses (e.g.,CHAR(30))
-2. If we store a string that is shorter than the specified length, MySQL will pad it with spaces; if the string is longer than the specified length, MySQL will truncate it.
-3. CHAR is faster for data retrieval because all values are the same length.
+## MySQL 分页语法：
 
-### VARCHAR:
+```sql
+-- 在所有的查询结果中，返回前5行记录。
+SELECT prod_name FROM products LIMIT 5;
+-- 在所有的查询结果中，从第5行开始，返回5行记录。
+SELECT prod_name FROM products LIMIT 5,5;
+```
 
-1. This data type is used to store variable-length character strings. The length can be specified in the parentheses (e.g., VARCHAR(30)), which represents the maximum length.
-2. Unlike CHAR, VARCHAR only uses as much space as necessary to store the actual content. This can save space if we are storing strings that are significantly shorter than the maximum length.
+### 优化 limit 分页
+
+1. 索引覆盖扫描：
+
+- 定义： 索引覆盖扫描是指查询中的所有字段都包含在索引中，因此可以直接从索引中获取所需数据，而无需回表查找。
+- 实现方式：创建一个索引覆盖，确保查询所需的所有列都在索引中
+
+```sql
+CREATE INDEX idx_employee_covering ON employees (hire_date, id, first_name, last_name);
+
+SELECT id, first_name, last_name
+FROM employees
+ORDER BY hire_date
+LIMIT 10000, 20;
+
+```
+
+2. 延迟关联
+3. 将 limit 查询转换成已知位置 where 查询
+
+## 表跟表是怎么关联的？
+
+表与表之间常用的关联方式有两种：内连接， 外连接。
+
+### 内连接
+
+内连接通过`INNER JOIN`来实现，它将返回两张表中满足连接条件的数据，不满足条件的数据不会查询出来。
+
+### 外连接
+
+外连接通过`OUTER JOIN`来实现， 它将返回两张表中满足条件的数据，同时返回不满足连接条件的数据。外连接有两种形式：左外连接(LEFT OUTER JOIN)， 右外连接 (RIGHT OUTER JOIN).
+
+- 左外连接：它会返回左表中的所有记录和右表中满足连接条件的记录。
+- 右外连接： 它会返回右表中的所有记录和左表中满足连接条件的记录。
+
+- 一对多关联： 这种关联形式最为常见，一般是两张表具有主从关系，并且以主表的逐渐关联从表的外间来实现这种关联关系。
+- 多对多关联： 这种关联关系比较复杂，如果两张表具有多对多关系，那么他们之间需要一张中间表来作为衔接，以实现这种关联关系。这种表要设计两列，分别存储那两张表的主键。因此，两张表的任何一方，都与中间表形成了一对多关系，从而在中间表建立起了多对多关系。
+- 自关联： 自关联就是一张表自己与自己相关联。
+
+## SQL 注入的原理
+
+SQL 注入是一种常见的安全漏洞，它允许攻击者通过向应用程序的输入字段插入恶意的 SQL 代码，从而在数据库中执行未授权的操作。
+
+## WHERE 和 HAVING 有什么区别？
+
+WHERE 是一个约束声明， 使用 WHERE 约束来自数据库的数据，WHERE 是在结果返回之前起作用的，WHERE 中不能使用聚合函数。
+
+HAVING 用于在`SELECT`语句中结合`GROUP BY`语句使用，用于筛选分组后的记录。HAVING 应用于聚合函数之后，用于过滤聚合后的结果集。
+
+## 索引
+
+### 谈谈你对 MySQL 索引的理解
+
+索引是一个单独的，存储在磁盘上的数据结构，包含着对数据表里所有记录的引用指针。 使用索引可以快速找出在某个列中有一特定值的行，所有 MySQL 列类型都可以被索引。
+
+索引是在存储引擎中实现的，因此，每种存储引擎的索引都不一定完全相同。MySQL 中索引的存储类型有两种，即 BTREE 和 HASH,具体和表的存储引擎相关。
+
+### 索引类型：
+
+1. 普通索引和唯一索引
+
+```sql
+-- 创建普通索引
+CREATE INDEX idx_name on table_name (col_name);
+
+-- 创建唯一索引
+CREATE UNIQUE INDEX idx_name ON table_name (col_name);
+```
+
+2. 单列索引和组合索引
+
+```sql
+-- 创建单列索引
+CREATE INDEX idx_employee_id ON employees (id);
+
+-- 创建组合索引
+CREATE INDEX idx_employee_name_dept ON employees (last_name, department_id);
+```
+
+3. 全文索引
+   全文索引用于提高对文本内容进行搜索效率，特别是对于大段文字的查询。
+
+4. 空间索引
+   空间索引用于加速对地理空间数据的查询，特别是几何类型的数据，比如点，线，多边形等。空间索引常用的索引类型是`R-Tree`.
+
+### MySQL 怎么判断要不要加索引？
+
+1. 表的大小和数据增长
+2. 事务类型：如果表的读操作远多于写操作，添加索引是有益的，因为读取操作的性能会显著提高。
+
+### 索引是越多越好吗？
+
+索引并非越多越好，一个表中如有大量的索引，不仅占用磁盘空间，还会影响 INSERT, DELETE, UPDATE 语句的性能，因为在表中的数据更改时，索引也会进行调整和更新。
+
+### 有哪些情况不适合创建索引？
+
+1. 频繁更新的字段不适合创建索引
+2. where 条件中用不到的字段不适合建立索引
+3. 数据比较少的表不需要建索引
+4. 数据重复且分布比较均匀的字段不适合建立索引， 例如性别，真假值
+5. 参与计算的列不适合建索引
+
+### 如何判断数据库索引有没有生效？
+
+可以使用`EXPLAIN`语句查看索引是否正在使用
+
+example:
+
+```sql
+EXPLAIN SELECT * FROM book WHERE year_publication=1990;
+```
+
+### 最左前缀原则
+
+最左前缀原则是 MySQL 索引规则中的一个重要概念，特别是针对联合索引。它意味着在使用联合索引时，MySQL 只能从索引的最左边开始匹配字段，顺序是非常重要的。索引从最左边的字段开始逐步使用，不能跳过某个字段直接使用后面的字段。
+
+```sql
+CREATE INDEX idx_a_b on my_table(a, b);
+```
+
+这个索引是按`(a,b)`的顺序来组织数据的，先对`a`排序，然后在`a`相同的情况下对`b`进行排序。 因此，最左前缀规则意味着：
+
+- 如果查询条件中有`a`, MySQL 可以使用索引
+- 如果查询条件中有`a`和`b`，MySQL 仍然可以使用索引。
+- 但如果查询条件中只涉及`b`而没有`a`, MySQL 无法使用这个联合索引， 因为它不能跳过`a`直接使用`b`。
+
+### 说一说索引的实现原理
+
+在 MySQL 中，索引时在存储引擎层实现的， 不同存储引擎对索引的实现方式是不同的。InnoDB 是作为 MySQL 的主要的存储引擎并且使用 B+树作为索引结构，在 InnoDB 中，表数据文件本身就是按 B+树组织的一个索引结构，这颗树的叶节点 data 保存了完整的数据记录（聚集索引）。这个索引 key 时数据表的主键，因此 InnoDB 表数据文件本身就是主索引。
+
+### 介绍一下数据库索引的重构过程
+
+##### 什么时候需要重建索引呢？
+
+标上频繁发生 update， delete 操作
+
+
+### MySQL索引为什么用B+树？
+B+树由B树和索引顺序访问方法演化而来，它是一个平衡查找树。在B+树中，所有记录节点都是按照键值的大小顺序存放在同一层的叶子节点，各叶子节点通过指针进行连接。在数据库中，B+树的高度一般都在2-4层，这意味着查找某一键值最多只需要2到4次IO操作。
+
+### 联合索引的存储结构是什么，它的有效方式是什么？
+联合索引还是一颗B+树，不同的是联合索引的键值数量不是1，而是大于等于2。另外，只有在查询条件中使用了这些字段的左边字段时，索引才会被使用，所以使用联合索引时遵循最左前缀集合。
+
+### MySQL的Hash索引和B树索引有什么区别？
+- hash索引进行等值查询更快，但是无法进行范围查询。因为在hash索引中经过hash函数建立索引之后，索引的顺序与原顺序无法保持一致，不能支持范围查询。
+- hash索引不支持使用索引进行排序
+- hash索引不支持模糊查询以及索引的最左前缀匹配
+
+
+## 聚簇索引和辅助(非聚簇)索引有什么区别？
+聚簇索引等叶子节点存放了表中的所有记录。辅助索引索引是根据索引键创建的一颗B+树，与聚簇索引不同的是，其叶子节点仅存放索引键值，以及该索引键值指向的主键。
+
+### 什么是联合索引？
+联合索引是指对表上多个列进行索引。
+
+## 事务
+
+### 事务的四个特性(ACID):
+- A (atomicity): 原子性，原子性指整个数据库事务是不可分割的工作单位。只有使食物中的所有的数据库操作都执行成功，整个事务的执行才算成功。
+- C (consistency)：一致性，一致性指数据库在事务执行前后都必须保持一致的状态并且必须满足所有定义的约束。
+- I (isolation): 隔离性，事务的隔离性要求每个读写事务的对象和其他事物的操作对象能相互分离，即该事务提交前对其他事务都不可见，这通常用锁来实现
+- D (durability)： 持久性。事务一旦提交，其结果就是永久性的，即使发生宕机等故障，数据库也能将数据库恢复。
+
+### 事务可分为以下几种类型：
+- 扁平事务：在扁平事务中，所有的操作都处于同一层次，其由begin work开始，由commit work或rollback work结束。处于之间的操作是原子的，要么都执行，要么都回滚。。
+
+- 链事务：在一个事务结束时，系统会自动启动一个新事务，而不是让开发人员手动提交并启动下一个事务。换句话说，每次提交事务后，会直接进入下一个事务的处理过程。这种机制确保了数据处理的连续性，使得多个事务看起来像一个长事务，但每个事务都是独立提交的。
+  - 释放不需要的数据对象：当某个事务提交时，系统会释放当前事务中已经不再需要的锁定资源或数据对象。
+  - 上一个事务结果对下一个事务可见
+  - 提交和开始事务的原子性
+
+- 嵌套事务：有一个层次结构框架。有一个顶层事务(top-level transaction)控制着各个层次的事务。
+
+- 分布式事务： 分布式事务设计多个数据库或系统，在不同的数据库节点上执行部分操作。
+
+### 并发情况下，读操作可能存在3类问题：
+1. 脏读： 当前事务(A)中可以读到其他事务(B)未提交的数据(脏数据)，这种现象是脏读
+2. 不可重复读：在事务A中先后两次读取同一个数据，两次读取的结果不一样，这种现象称为不可重复读。脏读与不可重复读的区别在于：前者读到的是其他事务未提交的数据，后者读到的是其他事务已提交的数据。
+3. 幻读：在事务A中按照某个条件先后两次查询数据库，两次查询结果的条数不同，这种现象称为幻读。不可重复读与幻读的区别可以通俗理解为：前者是数据变了，后者是数据的行数变了。
+
+### MySQL 4种隔离级别：
+1. 读未提交(Read Uncommitted)：
+2. 读已提交(Read Committed):
+3. 可重复读(Repeatable Read):事务在开始时
+4. 串行化(Serializable): 串行化是最高级别的隔离级别，它通过强制事务顺序执行来避免所有并发问题。在这种隔离级别下，事务必须按顺序执行，彼此之间不能并发。

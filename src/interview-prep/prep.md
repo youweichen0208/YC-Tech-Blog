@@ -172,7 +172,6 @@ RsJS Observables are a powerful tool for managing asynchronous data streams in J
 2. Define Routes
 3. Add RouterOutlet in our template
 4. Link to Routes using RouterLink
-5. Lazy Loading Modules
 
 ## What is the intent of this SQL?
 
