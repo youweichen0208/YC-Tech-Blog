@@ -32,7 +32,7 @@ LINQ queries return results as objects. It enables us to use object-oriented app
 
 
 ## `IEnumerable<T>` and `IQueryable`:
-### Key Differences Between IEnumerable<T> and IQueryable<T>
+### Key Differences Between `IEnumerable<T>` and `IQueryable<T>`
 
 | **Feature**           | **IEnumerable<T>**                     | **IQueryable<T>**                        |
 |-----------------------|-----------------------------------------|------------------------------------------|
