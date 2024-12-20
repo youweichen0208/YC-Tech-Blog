@@ -30,334 +30,43 @@ LINQ queries return results as objects. It enables us to use object-oriented app
 
 5. **Flexibility**: LINQ provides a lot of flexibility for querying and manipulating data. We can filter, sort, group, transform, and aggregate data in many ways with LINQ's standard query operators.
 
-## LINQ Query Syntax:
 
-Query syntax in LINQ provides a declaretive and SQL-like way of expressive queries. It allows us to query collections and other data sources using a syntax that resembles SQL queries. The query syntax is useful when dealing with complex queries involving multiple conditions, joins, and projections.
+## `IEnumerable<T>` and `IQueryable`:
+### Key Differences Between IEnumerable<T> and IQueryable<T>
 
-### Basic Structure:
+| **Feature**           | **IEnumerable<T>**                     | **IQueryable<T>**                        |
+|-----------------------|-----------------------------------------|------------------------------------------|
+| **Source**            | In-memory collections (e.g., `List<T>`) | Remote data sources (e.g., database)     |
+| **Execution Location**| Client-side                            | Server-side                              |
+| **Query Translation** | Does not translate queries             | Translates LINQ queries into SQL, etc.   |
+| **Performance**       | Loads all data into memory first       | Fetches only the required data           |
+| **Use Case**          | Small datasets, in-memory operations   | Large datasets, querying external sources|
+| **Namespace**         | `System.Collections.Generic`           | `System.Linq`                            |
 
-```csharp
-var result = from variable in collection
-             [where condition]
-             [orderby property]
-             select projection;
-
-```
-
-- `from` clause: specifies the range variable (often referred to as the iteration variable) and the data source.
-- `where` clause: Optional. Specifies one or more conditions that the elements must satisfy. It filters the data source based on the specified criteria.
-- `orderby` clause: Optional. Specifies the sorting order for the elements in the result set. We can order by one or more properties in ascending or descending order.
-
-- `select` clause: Specifies the projection, i.e., what should be included in the result set. It defines the shape of the output.
-
-### Example:
-
-```csharp
-List<Student> students = GetStudents(); // Assume a list of Student objects
-
-var query = from student in students
-            where student.Marks > 80
-            orderby student.LastName
-            select new { student.FirstName, student.LastName };
-
-foreach (var result in query)
-{
-    Console.WriteLine($"{result.FirstName} {result.LastName}");
-}
-```
-
-- `students` is the data source
-- `from student in students` establishes the range variable (`student`) and the data source (`students`).
-- `select new { student.FirstName, student.LastName }` defines the projection, creating an anonymous type with first and last names.
-
-```csharp
-var query = from student in students
-            join course in courses on student.CourseId equals course.Id
-            where student.Marks > 80
-            orderby student.LastName
-            select new { student.FirstName, student.LastName, course.CourseName };
-
-```
-
-In this case, the `join` clause is used to combine data from two collections based on a specified key (`CourseId` and `Id` in this example).
-
-## LINQ Method Syntax:
-
-Method syntax is more concise and may be preferable in certain situations, especially for simpler queries or when working with developers more familiar with method chaining.
-
-### Basic structure
-
-```csharp
-var result = collection
-    .Where(item => condition)
-    .OrderBy(item => property)
-    .Select(item => projection);
-
-```
-
-- `Where` method: filters the elements based on a specified condition.
-- `OrderBy` method: sorts the elements in ascending order based on a specified property. We can also use `OrderByDescending` for descending order.
-- `Select` method: specifies the projection, defining what should be included in the result set.
-
-## Standard query operators:
-
+## Common LINQ commands:
 ### Where
+The `Where` method in LINQ is used to **filter** a sequence based on a condition. It returns a new sequence(`IEnumerable<T>` or `IQueryable<T>`, depending on the source) that includes only the elements satisfying the condition.
 
-The Where operator (Linq extension method) filters the collection based on a given criteria expression and returns a new collection. The criteria can be specified as lambda expression or Func delegate type.
+1. **Deferred Execution**: the filtering logic is only executed when the resulting sequence is enumerated.
+2. **Chainable**: can be combined with other LINQ methods like `Select`, `OrderBy`, etc.
+3. **Type Preservation**: the elements in the resulting sequence are of the same type as the input.
 
-Example:
-
+### OrderBy
+returns a new sequence(`IEnumerable<T>` or `IQueryable<T>`
+#### Ascending: `OrderBy`
 ```csharp
-class Program
-{
-    public static void Main()
-    {
-        IList<Student> studentList = new List<Student>()
-        {
-            new Student() { StudentID = 1, StudentName = "John", Age = 13 },
-            new Student() { StudentID = 2, StudentName = "Moin", Age = 21 },
-            new Student() { StudentID = 3, StudentName = "Bill", Age = 18 },
-            new Student() { StudentID = 4, StudentName = "Ram", Age = 20 },
-            new Student() { StudentID = 5, StudentName = "Ron", Age = 15 }
-        };
-
-        var teenAgeStudent = from student in studentList
-            where student.Age > 13 && student.Age < 20
-            select student;
-        Console.WriteLine("Teen age Students: ");
-        foreach (var student in teenAgeStudent)
-        {
-            Console.WriteLine(student.StudentName);
-        }
-    }
-}
+var result = collection.OrderBy(item=>key);
 ```
-
-Alternatively, we can also use a Func type delegate with an anonymous method to pass a predicate function as below.
-
+#### Descending: `OrderByDescending`
 ```csharp
-  Func<Student, bool> isTeenAger = delegate(Student s) { return s.Age > 13 && s.Age < 20;};
-        var result = from student in studentList
-            where isTeenAger(student)
-            select student;
+var result = collection.OrderByDescending(item=>key);
 ```
 
-### Where extention method in Method Syntax
-
-```csharp
-public static IEnumerable<TSource> Where<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);
-```
-
-In this signature, `TSource` is the type of the items in the collection, `source` is the collection to filter, and `predicate` is a `Func<TSource, bool>` delegate that defines the condition to filter the items.
-
-```csharp
-var filteredResult = studentList.Where(s => s.Age > 13 && s.Age < 20);
-```
-
-## OrderBy
-
-OrderBy sorts the values of a collection in `ascending` or `descending` order. It sorts the collection in ascending order by default because ascending order keyword is optional here. Use the `descending` keyword to sort the collection in descending order.
-
-```csharp
- var resultList = from student in studentList
-            orderby student.Age descending
-            select student;
-```
-
-### OrderBy in Method syntax
-
-#### ascending:
-
-```csharp
-var resultList = studentList.OrderBy(s => s.Age);
-```
-
-#### descending:
-
-```csharp
-var resultList = studentList.OrderByDescending(s => s.Age);
-```
-
-### Multiple Sorting:
-
-We can sort the collection on multiple fields separated by comma. The given collection would be first sorted based on the first field and then if value or first field would be the same for two elements then it would use second field for sorting and so on.
-
-#### query syntax
-
-```csharp
- var resultList = from student in studentList
-            orderby student.StudentName, student.Age
-            select student;
-```
-
-#### method syntax:
-
-```csharp
-var resultList = studentList.OrderBy(s => s.StudentName).ThenBy(s => s.Age);
-```
-
-In the example above, `OrderBy` sorts the students by name, and then `ThenBy` sorts the students with the same name by age. The result is a sequence of students sorted first by name and then by age. We can chain as many `ThenBy` or `ThenByDescending` calls as we need to perform additional sorts. For example, if the `Student` class also had a `Grade` property, we could sort by name, then age, then grade like this.
-
-```csharp
-var sortedStudents = students.OrderBy(s => s.Name).ThenBy(s => s.Age).ThenBy(s => s.Grade);
-```
-
-### Points to rememeber:
-
-1. LINQ includes five sorting operators: OrderBy, OrderByDescending, ThenBy, ThenByDescending
-2. LINQ query syntax does not support OrderByDescending, ThenBy, ThenByDescending. It only supports `orderby` clause with `ascending` and `descending` sorting direction.
-3. LINQ query syntax supports multiple sorting fields separated by comma whereas we have to use `ThenBy` & `ThenByDescending` for secondary sorting.
-
-## Grouping Operators: GroupBy
-
-when we use the `group` keyword in LINQ, it creates a sequence of `IGrouping<TKey, TElement>` objects, where `TKey` is the type of the key we are grouping by, where `TKey` is the type of the key we are grouping by, and `TElement` is the type of the elements in the group. Each `IGrouping<TKey, TElement>` object represents a group of elements that have the same key.
-
-### GroupBy in query syntax:
-
-```csharp
-     var resultList = from s in studentList
-            group s by s.StudentName;
-
-        foreach (var group in resultList)
-        {
-            foreach (var student in group)
-            {
-                Console.WriteLine(student.StudentName + " " + student.StudentID);
-            }
-        }
-```
-
-In the first `foreach` loop, `student` is not a `Student` object, but an `IGrouping<string, Student>` object. We can access the key of the group with the `key` property, and we can enumerate the students in the group with a nested `foreach` loop.
-
-### GroupBy in method syntax:
-
-```csharp
-var resultList = studentList.GroupBy(s => s.StudentName);
-```
-
-## Join Operator:
-
-### Join in method syntax
-
-```csharp
-var joinResult = list1.Join(
-    list2,
-    item1 => item1.Key,  // Outer key selector
-    item2 => item2.Key,  // Inner key selector
-    (item1, item2) => new { Item1 = item1, Item2 = item2 }  // Result selector
-);
-```
-
-- `item1 => item1.Key` is the outer key selector. It's a function that takes an element from the outer sequence (`list1`) and returns the key for that element.
-- `item2 => item2.Key` is the inner key selector. It's a function that takes an element from the inner sequence (`list2`) and returns the key for that element.
-- We **CANNOT** switch the order of the outer and inner key selectors in a LINQ join operation. The outer key selector must correspond to the first (or "outer") collection we are joining, and the inner key selector must correspond to the second (or "inner") collection we are joining.
-
-equivalent sql:
-
-```sql
-SELECT stu.StudentName, std.StandardName
-FROM studentList stu JOIN standardList std ON stu.StandardID = std.StandardID
-```
-
-### Join in Query Syntax:
-
-```csharp
-from ... in outerSequence
-      join ... in innerSequence
-      on outerKey equals innerKey
-      select ...
-```
-
-#### Example
-
-```csharp
-  var innerJoinResult = from student in studentList
-            join standard in standardList
-                on student.StandardID equals standard.StandardID
-            select new { StudentName = student.StudentName, StandardName = standard.StandardName };
-```
-
-## DefaultIfEmpty
-
-The DefaultIfEmpty() method returns a new collection with the default value if the given collection on which DefaultIfEmpty() is invoked is empty. Another overload method of DefaultIfEmpty() takes a value parameter that should be replaced with default value.
-
-```csharp
-        IList<string> emptyList = new List<string>();
-
-        var newList1 = emptyList.DefaultIfEmpty();
-        var newlist2 = emptyList.DefaultIfEmpty("None");
-
-        Console.WriteLine("newlist1 Count: {0}", newList1.Count());
-        Console.WriteLine("newlist1 Value: {0}", newList1.ElementAt(0));
-
-        Console.WriteLine("newlist2 Count: {0}", newlist2.Count());
-        Console.WriteLine("newlist2 Count: {0}", newlist2.ElementAt(0));
-```
-
-In the above example, `emptyList.DefaultIfEmpty()` returns a new string collection with one element value whose value is null because null is a default value of string. Another method `emptyList.DefaultIfEmpty("none")` returns a new string collection with one element whose value is "None" instead of null.
-
-## GroupJoin
-
-In a grouped join, for each element in the outer sequence, a result element is created. This result element contains the element from the outer sequence and a collection of all matching elements from the inner sequence. If an element in the outer sequence has no matching elemeents in the inner sequence, the collection for that element will be empty.
-
-### GroupJoin in Method Syntax
-
-```csharp
-var groupedResult = standardList.GroupJoin( //outer sequence
-    studentList,  // Inner sequence
-    std => std.StandardID,  // Outer key selector
-    s => s.StandardID,  // Inner key selector
-    (std, studentsGroup) => new  // Result selector
-    {
-        Students = studentsGroup,
-        StandardName = std.StandardName
-    }
-);
-```
-
-- In the `GroupJoin` method, the third parameter is a result selector that takes two arguments: an element from the outer sequence and a collection of all matching elements from the inner sequence.
-- From the example above, `std` is an element from the outer sequence standardList
-- `studentGroup` is a collection of all matching elements from the inner sequence (`orders`).
-
-### GroupJoin in Query Syntax:
-
-```csharp
-from ... in outerSequence
-join ... in innerSequence
-on outerKey equals innerKey
-into groupedCollection
-select ...
-```
-
-Example:
-
-```csharp
-var students = new List<Student> { /* ... */ };
-var standards = new List<Standard> { /* ... */ };
-
-var groupedJoin = from s in standards
-                  join stu in students on s.StandardID equals stu.StandardID into standardGroup
-                  select new { Standard = s, Students = standardGroup };
-```
-
-## Left Join:
-
-```csharp
-        var resultList = from standard in standardList
-            join student in studentList on standard.StandardID equals student.StandardID
-                into tmpList
-            from co in tmpList.DefaultIfEmpty()
-            select new { Standard = standard, Student = co };
-```
-
-- `join...into` performs a group join of `standardList` and `studentList` based on `StandardID`. The result is a temporary collection `tmpList` that contains all matching students for each standard.
-- `from co in tmpList.DefaultIfEmpty()` is used to ensure that all elements from outer sequence are included in the final result, even if they don't have any matching elements in the inner sequence.
-
-## Quantifier Operators
+### Quantifier Operators
 
 The quantifier operators evaluate elements of the sequence on some condition and return a boolean value to indicate that some or all elements satisfy the condition.
 
-### All
+#### All
 
 Checks if all the elements in a sequence satisfies the specified condition.
 
@@ -365,7 +74,7 @@ Checks if all the elements in a sequence satisfies the specified condition.
 bool checkAge = studentList.All(s=> s.Age > 19 && s.Age < 21);
 ```
 
-### Any
+#### Any
 
 Checks if any of the elements in a sequence satisfies the specified condition.
 
@@ -373,155 +82,73 @@ Checks if any of the elements in a sequence satisfies the specified condition.
 bool checkAge = studentList.Any(s=> s.Age > 19 && s.Age < 21);
 ```
 
-## First & FirstOrDefault:
+### First & FirstOrDefault:
 
-### First
+#### First
 
 The First element operator returns the first record when there is one or more matching value found and if no matching record got found, it will throw an exception.
 
-### FirstOrDefault:
+#### FirstOrDefault:
 
 The FirstOrDefault operator returns the first record and when there is no matching values found,then assign null value.
 
-## Single & SingleOrDefault
+### Single & SingleOrDefault
 
-### Single
+#### Single
 
 It will return matched single record but if we can not find any matching record, it will throw a NoMatchException. If we have more than one record found,
 it will also throw MoreThanOneMatchException.
 
-```csharp
-List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
 
-// Using Single
-int singleNumber = numbers.Single(n => n == 3);  // singleNumber will be 3
-```
-
-### SingleOrDefault:
+#### SingleOrDefault:
 
 It will return the matched single record, but if no matching record found, then it will assign a default value. And if there is more than
 one matching record got found, it will throw an exception.
 
-## How to implement pagination in LINQ:
 
-In LINQ, we can implement pagination using the `Skip()` and `Take()` methods.
+### Select 
+In LINQ, `Select()` is a method used to project or transform elements of a collection into a new form. It allows us to define a transformation function to apply to each element in the collection and returns `IEnumerable<T>` or `IQueryable<T>` of the projected elements.
 
+- elements projection
 ```csharp
-using System;
-using System.Linq;
+int[] numbers = { 1, 2, 3, 4, 5 };
 
-class Program
+var doubledNumbers = numbers.Select(n => n * 2);
+
+foreach (var number in doubledNumbers)
 {
-    static void Main()
-    {
-        // Sample data source (you can replace this with your actual data source)
-        var data = Enumerable.Range(1, 100); // Represents a collection of 100 elements
-
-        // Pagination parameters
-        int pageNumber = 2; // The page number you want to retrieve
-        int pageSize = 10; // The number of items per page
-
-        // Calculate the number of items to skip based on the page number and page size
-        int itemsToSkip = (pageNumber - 1) * pageSize;
-
-        // Use Skip() and Take() for pagination
-        var pageOfData = data.Skip(itemsToSkip).Take(pageSize);
-
-        // Display the results
-        Console.WriteLine($"Page {pageNumber} of data:");
-        foreach (var item in pageOfData)
-        {
-            Console.WriteLine(item);
-        }
-    }
-}
-```
-
-- `Skip(itemsToSkip)` is used to skip the specified number of elements(items to skip), which is calculated based on the page number and page size.
-- `Take(pageSize)` is used to take the specified number of elements(page size) from the skipped position.
-
-## Basic LINQ Operations on Strings
-
-1. **Filtering Strings**
-   We can use the `Where` method to filter strings based on a condition
-
-```csharp
-string[] words = { "apple", "banana", "cherry", "date" };
-var result = words.Where(word => word.StartsWith("a"));
-
-foreach (var word in result)
-{
-    Console.WriteLine(word);  // Output: apple
+    Console.WriteLine(number);  // Output: 2, 4, 6, 8, 10
 }
 
 ```
 
-2. **Transforming Strings**
-   The `Select` method is used to project each element of a sequence into a new form.
-
+- selecting properties from objects
 ```csharp
-string[] words = { "apple", "banana", "cherry" };
-var result = words.Select(word => word.ToUpper());
-
-foreach (var word in result)
+class Employee
 {
-    Console.WriteLine(word);  // Output: APPLE, BANANA, CHERRY
+    public string Name { get; set; }
+    public int Salary { get; set; }
+}
+
+List<Employee> employees = new List<Employee>
+{
+    new Employee { Name = "Alice", Salary = 60000 },
+    new Employee { Name = "Bob", Salary = 50000 },
+    new Employee { Name = "Charlie", Salary = 70000 }
+};
+
+// Select only the names of the employees
+var employeeNames = employees.Select(e => e.Name);
+
+foreach (var name in employeeNames)
+{
+    Console.WriteLine(name);  // Output: Alice, Bob, Charlie
 }
 
 ```
 
-3. **Sorting Numbers**
 
-- Sorting in Ascending Order
-
-```csharp
-using System;
-using System.Linq;
-
-public class HelloWorld
-{
-    public static void Main(string[] args)
-    {
-        int[] numbers = { 5, 3, 8, 1, 2 };
-
-        // Sort in ascending order
-        var sortedNumbers = numbers.OrderBy(n => n);
-
-        Console.WriteLine("Numbers in ascending order:");
-        foreach (var num in sortedNumbers)
-        {
-            Console.WriteLine(num);
-        }
-    }
-}
-
-```
-
-- Sorting in descending order
-
-```csharp
-using System;
-using System.Linq;
-
-public class HelloWorld
-{
-    public static void Main(string[] args)
-    {
-        int[] numbers = { 5, 3, 8, 1, 2 };
-
-        // Sort in descending order
-        var sortedNumbers = numbers.OrderByDescending(n => n);
-
-        Console.WriteLine("Numbers in descending order:");
-        foreach (var num in sortedNumbers)
-        {
-            Console.WriteLine(num);
-        }
-    }
-}
-```
-
-4. **Aggregating Numbers**
+### **Aggregating Numbers**
 
 - `Sum`: it calculates the total sum of the elements in a collection.
 
@@ -599,105 +226,17 @@ public class HelloWorld
 
 ```
 
-- `Count`: it counts the number of elements in a collection.
+### TakeWhile
+the `TakeWhile()` is used to return elements from a sequence as long as a specified condition is true. As soon as the condition fails, it stops and returns the elements (`IEnumerable` and `IQueryable`) at that point.
 
 ```csharp
-using System;
-using System.Linq;
+int[] numbers = { 1, 2, 3, 4, 5, 6, 7 };
 
-public class HelloWorld
+var result = numbers.TakeWhile(n => n < 5);
+
+foreach (var number in result)
 {
-    public static void Main(string[] args)
-    {
-        int[] numbers = { 5, 3, 8, 1, 2 };
-
-        int count = numbers.Count();
-        Console.WriteLine($"Count: {count}");  // Output: Count: 5
-    }
+    Console.WriteLine(number);  // Output: 1, 2, 3, 4
 }
-
-```
-
-- `Aggregating with aggregation function`: applies the aggregation function
-
-```csharp
-using System;
-using System.Linq;
-
-public class HelloWorld
-{
-    public static void Main(string[] args)
-    {
-        int[] numbers = { 5, 3, 8, 1, 2 };
-
-        // Calculate the product of all numbers
-        int product = numbers.Aggregate((acc, n) => acc * n);
-        Console.WriteLine($"Product: {product}");  // Output: Product: 240
-
-        // Calculate a custom aggregation, e.g., sum of squares
-        int sumOfSquares = numbers.Aggregate(0, (acc, n) => acc + n * n);
-        Console.WriteLine($"Sum of Squares: {sumOfSquares}");  // Output: Sum of Squares: 103
-    }
-}
-
-```
-
-## Advanced LINQ Operations on Strings
-
-1. **Grouping Strings**
-   We can group strings based on a key selector function using the `GroupBy` method.
-
-```csharp
-string[] words = { "apple", "apricot", "banana", "cherry", "blueberry" };
-var result = words.GroupBy(word => word[0]);
-
-foreach (var group in result)
-{
-    Console.WriteLine($"Words that start with {group.Key}:");
-    foreach (var word in group)
-    {
-        Console.WriteLine(word);
-    }
-}
-// Output:
-// Words that start with a:
-// apple
-// apricot
-// Words that start with b:
-// banana
-// blueberry
-// Words that start with c:
-// cherry
-```
-
-2. **Finding Elements**
-   We can use `First`, `FirstOrDefault`, `Last`, `LastOrDefault`, `Single`, or `SingleOrDefault` to find elements that match a condition.
-
-- `First`: returns the first element of a sequence that satisfies a specified condition or simply and will throw exception if no condition is satisfied.
-- `FirstOrDefault`: returns the first element of a sequence, or a default value if the sequence is empty.
-- `Single`: returns the only element of a sequence that satisfies a specific condition and will throw exception if empty sequence or multiple matches.
-- `SingleOrDefault`: return the only element of a sequence that satisfies a specified condition. It differs from `Single` in that it doesn't throw an exception if the sequence is empty or if no element matches the condition. However, like `Single`, it does throw an exception if more than one element satisfies the condition.
-
-```csharp
-string[] words = { "apple", "banana", "cherry" };
-var firstWord = words.FirstOrDefault(word => word.StartsWith("b"));
-
-Console.WriteLine(firstWord);  // Output: banana
-
-```
-
-3. **Checking for Existence**:
-   The `Any` and `All` methods can be used to check for the existence of elemenets that satisfy a condition.
-
-- `Any`: determines whether any elements in a sequence satisfy a specified condition.
-- `All`: determines whether all elements in a sequence satisfy a specified condition.
-
-```csharp
-string[] words = { "apple", "banana", "cherry" };
-bool anyWordStartsWithB = words.Any(word => word.StartsWith("b"));
-bool allWordsContainA = words.All(word => word.Contains("a"));
-
-Console.WriteLine(anyWordStartsWithB);  // Output: true
-Console.WriteLine(allWordsContainA);    // Output: false
 
 ```
