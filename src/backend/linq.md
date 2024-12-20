@@ -52,7 +52,7 @@ The `Where` method in LINQ is used to **filter** a sequence based on a condition
 3. **Type Preservation**: the elements in the resulting sequence are of the same type as the input.
 
 ### OrderBy
-returns a new sequence(`IEnumerable<T>` or `IQueryable<T>`
+returns a new sequence(`IEnumerable<T>` or `IQueryable<T>`)
 #### Ascending: `OrderBy`
 ```csharp
 var result = collection.OrderBy(item=>key);
