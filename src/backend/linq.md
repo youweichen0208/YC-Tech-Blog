@@ -34,7 +34,7 @@ LINQ queries return results as objects. It enables us to use object-oriented app
 ## `IEnumerable<T>` and `IQueryable`:
 ### Key Differences Between `IEnumerable<T>` and `IQueryable<T>`
 
-| **Feature**           | **IEnumerable<T>**                     | **IQueryable<T>**                        |
+| **Feature**           | **`IEnumerable<T>`**                     | **`IQueryable<T>`**                        |
 |-----------------------|-----------------------------------------|------------------------------------------|
 | **Source**            | In-memory collections (e.g., `List<T>`) | Remote data sources (e.g., database)     |
 | **Execution Location**| Client-side                            | Server-side                              |
