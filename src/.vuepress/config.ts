@@ -3,6 +3,7 @@ import theme from "./theme.js";
 // import { docsearchPlugin } from "@vuepress/plugin-docsearch";
 // import { searchProPlugin } from "vuepress-plugin-search-pro";
 export default defineUserConfig({
+  // 使用自定义域名时改为 "/"，使用 GitHub Pages 默认域名时改为 "/YC-Tech-Blog/"
   base: "/YC-Tech-Blog/",
 
   lang: "en-US",
