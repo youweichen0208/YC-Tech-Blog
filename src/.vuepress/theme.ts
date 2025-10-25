@@ -14,7 +14,7 @@ export default hopeTheme({
 
   logo: "/pfp.jpg",
 
-  repo: "vuepress-theme-hope/vuepress-theme-hope",
+  repo: "youweichen0208/YC-Tech-Blog",
 
   docsDir: "src",
 
@@ -24,7 +24,7 @@ export default hopeTheme({
   // sidebar
   sidebar,
 
-  footer: "Default footer",
+  footer: "© 2024 Youwei Chen - Tech Blog",
 
   displayFooter: true,
 
@@ -38,13 +38,9 @@ export default hopeTheme({
     description: "A fullstack programmer",
     intro: "/intro.html",
     medias: {
-      Discord: "https://example.com",
-      Email: "mailto:info@example.com",
-      GitHub: "https://example.com",
-      Gitlab: "https://example.com",
-      Gmail: "mailto:info@example.com",
-      Instagram: "https://example.com",
-      Linkedin: "https://example.com",
+      Email: "mailto:youweichen0208@gmail.com",
+      GitHub: "https://github.com/youweichen0208",
+      Linkedin: "https://www.linkedin.com/in/youwei-chen",
     },
   },
 

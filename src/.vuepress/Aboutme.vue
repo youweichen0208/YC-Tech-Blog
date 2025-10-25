@@ -123,24 +123,145 @@ export default {
 </script>
 
 <style scoped>
-/* Add your component styles here */
-.section {
-  border-bottom: 1px solid lightgrey;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-}
+/* Modern, responsive design */
 .container {
   display: flex;
   flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+.section {
+  background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .profile {
   display: flex;
   flex-direction: row;
-  gap: 3vw;
+  gap: 2rem;
+  align-items: center;
 }
 
 .profile img {
-  width: 20vw;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #667eea;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.profile img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+.profile-section h3 {
+  color: #2563eb;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+}
+
+.profile-section p {
+  margin: 0.5rem 0;
+  color: #475569;
+  font-size: 1.05rem;
+}
+
+.education h1,
+.experience h1,
+.projects h1 {
+  color: #1e293b;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.education p {
+  color: #475569;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+section {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+}
+
+section h3 {
+  color: #2563eb;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+section ul {
+  list-style: none;
+  padding: 0;
+}
+
+section li {
+  padding: 0.5rem 0;
+  color: #475569;
+  line-height: 1.7;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+section li::before {
+  content: "▹";
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: bold;
+}
+
+section strong {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .profile {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile img {
+    width: 150px;
+    height: 150px;
+  }
+
+  .section {
+    padding: 1.5rem;
+  }
+
+  .education h1,
+  .experience h1,
+  .projects h1 {
+    font-size: 1.5rem;
+  }
 }
 </style>
