@@ -3,7 +3,7 @@ import theme from "./theme.js";
 // import { docsearchPlugin } from "@vuepress/plugin-docsearch";
 // import { searchProPlugin } from "vuepress-plugin-search-pro";
 export default defineUserConfig({
-  base: "/",
+  base: "/YC-Tech-Blog/",
 
   lang: "en-US",
   title: "YC Tech Blog",
