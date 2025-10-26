@@ -46,6 +46,14 @@ export default sidebar({
       ],
     },
     {
+      text: "🆕 核心服务",
+      icon: "gears",
+      children: [
+        "SCHEDULER_SERVICE",
+        "SCHEDULER_QUICKSTART",
+      ],
+    },
+    {
       text: "开发指南",
       icon: "laptop-code",
       children: [
