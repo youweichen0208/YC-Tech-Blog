@@ -103,6 +103,7 @@ export default sidebar({
       children: [
         "deployment/DEPLOYMENT_GUIDE",
         "DEPLOYMENT",
+        "MONITORING",
       ],
     },
   ],
