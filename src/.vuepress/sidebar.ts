@@ -38,6 +38,13 @@ export default sidebar({
   "/quant-platform/": [
     "",
     {
+      text: "📅 开发日志",
+      icon: "calendar-days",
+      children: [
+        "DEVLOG_20251028",
+      ],
+    },
+    {
       text: "架构设计",
       icon: "sitemap",
       children: [
