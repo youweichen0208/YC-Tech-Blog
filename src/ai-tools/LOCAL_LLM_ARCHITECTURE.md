@@ -10,45 +10,54 @@
 
 ```mermaid
 graph TB
-    subgraph "Claude Tools 生态"
-        A[Claude Code CLI] --> B[工具调用层]
-        B --> C[本地LLM工具]
+    subgraph "🤖 Claude Tools 生态"
+        A["Claude Code CLI<br/>🖥️ 用户界面"] --> B["工具调用层<br/>🔧 API Bridge"]
+        B --> C["本地LLM工具<br/>🎯 智能路由"]
     end
 
-    subgraph "Docker 容器集群"
-        C --> D[代理服务容器<br/>local-llm-proxy:8000]
-        D --> E[Ollama 容器<br/>ollama:11434]
+    subgraph "🐳 Docker 容器集群"
+        C --> D["代理服务容器<br/>📡 local-llm-proxy:8000"]
+        D --> E["Ollama 容器<br/>🧠 ollama:11434"]
 
-        subgraph "模型容器组"
-            E --> F[Llama 3.1 8B<br/>通用AI助手]
-            E --> G[Qwen 2.5 7B<br/>中文专家]
-            E --> H[DeepSeek Coder 6.7B<br/>代码专家]
+        subgraph "🤖 模型容器组"
+            E --> F["Llama 3.1 8B<br/>💬 通用AI助手"]
+            E --> G["Qwen 2.5 7B<br/>🇨🇳 中文专家"]
+            E --> H["DeepSeek Coder 6.7B<br/>💻 代码专家"]
         end
 
-        subgraph "基础设施容器"
-            I[Redis 缓存<br/>:6379]
-            J[Prometheus 监控<br/>:9090]
-            K[Grafana 可视化<br/>:3000]
+        subgraph "🛠️ 基础设施容器"
+            I["Redis 缓存<br/>⚡ :6379"]
+            J["Prometheus 监控<br/>📊 :9090"]
+            K["Grafana 可视化<br/>📈 :3000"]
         end
     end
 
-    subgraph "智能路由策略"
-        L{任务类型识别}
-        L -->|代码相关| H
-        L -->|中文处理| G
-        L -->|通用任务| F
-        L -->|复杂推理| M[Claude API]
+    subgraph "🎯 智能路由策略"
+        L{"任务类型识别<br/>🔍 Smart Router"}
+        L -->|"代码相关<br/>🔨 Code Tasks"| H
+        L -->|"中文处理<br/>🈳 Chinese Tasks"| G
+        L -->|"通用任务<br/>💡 General Tasks"| F
+        L -->|"复杂推理<br/>🧠 Complex Tasks"| M["Claude API<br/>☁️ Cloud Power"]
     end
 
     C --> L
-    D --> I
-    D --> J
+    D -.-> I
+    D -.-> J
+    J --> K
 
-    style A fill:#e1f5fe
-    style C fill:#f3e5f5
-    style D fill:#e8f5e8
-    style E fill:#fff3e0
-    style L fill:#fce4ec
+    %% 样式定义
+    classDef claudeStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef containerStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef modelStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef infraStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef routerStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+
+    %% 应用样式
+    class A,B,C claudeStyle
+    class D,E containerStyle
+    class F,G,H,M modelStyle
+    class I,J,K infraStyle
+    class L routerStyle
 ```
 
 ## 🎯 核心优势

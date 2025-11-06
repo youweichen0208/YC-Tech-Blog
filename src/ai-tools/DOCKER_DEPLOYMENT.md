@@ -7,22 +7,32 @@
 ### 系统架构
 ```mermaid
 graph TB
-    subgraph "Docker 容器集群"
-        A[claude-local-llm-proxy<br/>代理服务容器] --> B[claude-ollama<br/>模型运行容器]
-        A --> C[claude-redis<br/>缓存容器]
-        A --> D[claude-prometheus<br/>监控容器]
-        D --> E[claude-grafana<br/>可视化容器]
+    subgraph "🐳 Docker 容器集群"
+        A["claude-local-llm-proxy<br/>📡 代理服务容器<br/>Port: 8000"] --> B["claude-ollama<br/>🧠 模型运行容器<br/>Port: 11434"]
+        A --> C["claude-redis<br/>⚡ 缓存容器<br/>Port: 6379"]
+        A --> D["claude-prometheus<br/>📊 监控容器<br/>Port: 9090"]
+        D --> E["claude-grafana<br/>📈 可视化容器<br/>Port: 3000"]
     end
 
-    subgraph "Claude Tools"
-        F[Claude Code CLI] --> A
+    subgraph "🤖 Claude Tools"
+        F["Claude Code CLI<br/>🖥️ 用户界面"] --> A
     end
 
-    subgraph "AI 模型"
-        B --> G[Llama 3.1 8B]
-        B --> H[Qwen 2.5 7B]
-        B --> I[DeepSeek Coder 6.7B]
+    subgraph "🧠 AI 模型"
+        B --> G["Llama 3.1 8B<br/>💬 通用助手"]
+        B --> H["Qwen 2.5 7B<br/>🇨🇳 中文专家"]
+        B --> I["DeepSeek Coder 6.7B<br/>💻 代码专家"]
     end
+
+    %% 样式定义
+    classDef containerStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef claudeStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef modelStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+
+    %% 应用样式
+    class A,B,C,D,E containerStyle
+    class F claudeStyle
+    class G,H,I modelStyle
 ```
 
 ### 核心优势
