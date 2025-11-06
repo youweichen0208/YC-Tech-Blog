@@ -54,6 +54,17 @@ export default navbar([
     ],
   },
   {
+    text: "🤖 AI Tools",
+    icon: "robot",
+    prefix: "/ai-tools/",
+    children: [
+      { text: "本地大模型架构", icon: "microchip", link: "LOCAL_LLM_ARCHITECTURE" },
+      { text: "Docker快速部署", icon: "docker", link: "QUICKSTART" },
+      { text: "代码总览", icon: "code", link: "CODE_OVERVIEW" },
+      { text: "部署指南", icon: "rocket", link: "DOCKER_DEPLOYMENT" },
+    ],
+  },
+  {
     text: "Quant Platform",
     icon: "chart-line",
     link: "/quant-platform/",
