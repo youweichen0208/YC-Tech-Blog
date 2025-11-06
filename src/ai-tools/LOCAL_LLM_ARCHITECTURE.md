@@ -8,6 +8,8 @@
 
 ## 🏗️ 系统架构图
 
+### 完整架构流程图
+
 ```mermaid
 graph TB
     subgraph "🤖 Claude Tools 生态"
@@ -58,6 +60,51 @@ graph TB
     class F,G,H,M modelStyle
     class I,J,K infraStyle
     class L routerStyle
+```
+
+### 架构概述（文本版本）
+
+如果上述图表无法显示，以下是架构的文字描述：
+
+```
+📱 用户界面层
+└── Claude Code CLI (用户交互入口)
+    └── 工具调用层 (API Bridge)
+        └── 本地LLM工具 (智能路由)
+
+🐳 Docker 容器集群
+├── 📡 代理服务容器 (local-llm-proxy:8000)
+│   ├── 连接 → 🧠 Ollama 容器 (ollama:11434)
+│   ├── 连接 → ⚡ Redis 缓存 (:6379)
+│   └── 连接 → 📊 Prometheus 监控 (:9090)
+│       └── 连接 → 📈 Grafana 可视化 (:3000)
+│
+├── 🤖 AI 模型容器组
+│   ├── 💬 Llama 3.1 8B (通用AI助手)
+│   ├── 🇨🇳 Qwen 2.5 7B (中文专家)
+│   └── 💻 DeepSeek Coder 6.7B (代码专家)
+│
+└── 🎯 智能路由策略
+    ├── 🔨 代码相关任务 → DeepSeek Coder
+    ├── 🈳 中文处理任务 → Qwen 2.5
+    ├── 💡 通用任务 → Llama 3.1
+    └── 🧠 复杂推理 → Claude API
+```
+
+### 数据流向图
+
+```
+用户请求 → Claude Code CLI → 工具调用层 → 本地LLM工具
+    ↓
+任务类型识别 (Smart Router)
+    ↓
+根据任务类型路由到相应模型：
+├── 代码任务 → DeepSeek Coder 6.7B
+├── 中文任务 → Qwen 2.5 7B
+├── 通用任务 → Llama 3.1 8B
+└── 复杂任务 → Claude API
+    ↓
+模型处理 → 结果返回 → 用户界面
 ```
 
 ## 🎯 核心优势
