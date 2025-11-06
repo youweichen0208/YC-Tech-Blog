@@ -385,14 +385,25 @@ async def health_check():
 @app.on_event("startup")
 async def startup_event():
     """应用启动事件"""
-    logger.info("🚀 本地大模型代理服务启动")
+    logger.info("🚀 Claude Tools 本地大模型代理服务启动")
     logger.info(f"📡 Ollama地址: {OLLAMA_BASE_URL}")
     logger.info(f"🎯 支持模型: {list(MODEL_CONFIGS.keys())}")
+    logger.info(f"🤖 Claude Tools集成: 已启用")
+
+    # Docker环境检测
+    import os
+    if os.path.exists('/.dockerenv'):
+        logger.info("🐳 运行环境: Docker容器")
+
+    # 检查Claude Tools环境变量
+    claude_tools_enabled = os.getenv('CLAUDE_TOOLS_ENABLED', 'false').lower() == 'true'
+    if claude_tools_enabled:
+        logger.info("✅ Claude Tools集成已启用")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """应用关闭事件"""
-    logger.info("🔌 本地大模型代理服务关闭")
+    logger.info("🔌 Claude Tools 本地大模型代理服务关闭")
 
 if __name__ == "__main__":
     import argparse

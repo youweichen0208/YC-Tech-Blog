@@ -1,4 +1,5 @@
-# Docker 容器化部署配置
+# Claude Tools + 本地大模型 Docker 集成部署
+# 优化版本：支持跨平台、自动扩容、完整监控
 
 version: '3.8'
 
@@ -8,40 +9,80 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: local-llm-proxy
+      args:
+        - CLAUDE_TOOLS_VERSION=latest
+    container_name: claude-local-llm-proxy
     ports:
       - "8000:8000"
     environment:
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_HOST=ollama:11434
+      - REDIS_URL=redis://redis:6379
+      - CLAUDE_TOOLS_ENABLED=true
       - PROXY_HOST=0.0.0.0
       - PROXY_PORT=8000
       - LOG_LEVEL=info
+      - PROMETHEUS_ENABLED=true
+      - CORS_ORIGINS=*
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
     volumes:
       - ./logs:/app/logs
+      - ./config:/app/config
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '1.0'
+    networks:
+      - claude-llm-network
 
   # Ollama 模型服务
   ollama:
     image: ollama/ollama:latest
-    container_name: ollama
+    container_name: claude-ollama
     ports:
       - "11434:11434"
     environment:
+      - OLLAMA_ORIGINS=*
+      - OLLAMA_HOST=0.0.0.0
       - OLLAMA_GPU_LAYERS=99
       - OLLAMA_NUM_PARALLEL=2
       - OLLAMA_MAX_LOADED_MODELS=3
+      - OLLAMA_FLASH_ATTENTION=1
     volumes:
       - ollama_data:/root/.ollama
       - ./models:/models
     restart: unless-stopped
-    # 如果有 NVIDIA GPU 支持
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 12G
+          cpus: '6.0'
+        reservations:
+          memory: 6G
+          cpus: '3.0'
+    networks:
+      - claude-llm-network
+    # 如果有 GPU 支持（可选）
     # deploy:
     #   resources:
     #     reservations:
@@ -50,21 +91,38 @@ services:
     #           count: 1
     #           capabilities: [gpu]
 
-  # Redis 缓存（可选）
+  # Redis 缓存和会话管理
   redis:
     image: redis:7-alpine
-    container_name: local-llm-redis
+    container_name: claude-redis
     ports:
       - "6379:6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
     restart: unless-stopped
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    networks:
+      - claude-llm-network
 
-  # Prometheus 监控（可选）
+  # Prometheus 监控
   prometheus:
     image: prom/prometheus:latest
-    container_name: local-llm-prometheus
+    container_name: claude-prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -76,25 +134,68 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
     restart: unless-stopped
+    depends_on:
+      - local-llm-proxy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - claude-llm-network
 
-  # Grafana 可视化（可选）
+  # Grafana 可视化仪表板
   grafana:
     image: grafana/grafana:latest
-    container_name: local-llm-grafana
+    container_name: claude-grafana
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=claude123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_SERVER_ROOT_URL=http://localhost:3000/
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
     restart: unless-stopped
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - claude-llm-network
 
+  # 模型初始化服务（可选）
+  model-initializer:
+    image: ollama/ollama:latest
+    container_name: claude-model-init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ./scripts/init-models.sh:/init-models.sh
+    command: /bin/bash /init-models.sh
+    environment:
+      - OLLAMA_HOST=ollama:11434
+    networks:
+      - claude-llm-network
+    restart: "no"
+
+# 数据卷定义
 volumes:
   ollama_data:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/ollama
   redis_data:
     driver: local
   prometheus_data:
@@ -102,6 +203,17 @@ volumes:
   grafana_data:
     driver: local
 
+# 网络定义
 networks:
-  default:
-    name: local-llm-network
+  claude-llm-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# 扩展配置
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"

@@ -1,167 +1,187 @@
-# 🚀 本地大模型系统快速开始指南
+# 🐳 Claude Tools + 本地大模型 Docker 快速部署指南
 
-这是一个5分钟快速上手指南，帮助你在Mac M2上快速部署本地大模型系统。
+这是一个**5分钟快速部署指南**，帮助你通过 Docker 容器化方式部署 Claude Tools 与本地大模型集成系统。
 
 ## 📋 前置要求
 
-- Mac M2/M3 芯片（推荐）
-- macOS 12.0 或更高版本
-- 8GB+ 内存（推荐16GB+）
-- 20GB+ 可用存储空间
+### 系统要求
+- **Docker Desktop** 4.20+
+- **内存**: 8GB+（推荐16GB+）
+- **存储**: 20GB+ 可用空间
+- **平台**: Mac M1/M2、Linux x86_64、Windows WSL2
 
-## ⚡ 一键部署
-
-### 方式1: 脚本自动部署（推荐）
-
+### Docker 环境检查
 ```bash
-# 1. 下载部署脚本
-curl -O https://raw.githubusercontent.com/youweichen0208/YC-Tech-Blog/master/src/ai-tools/code/setup-local-llm.sh
+# 检查 Docker 版本
+docker --version
+docker compose version
 
-# 2. 给执行权限
-chmod +x setup-local-llm.sh
-
-# 3. 一键部署
-./setup-local-llm.sh install
+# 检查系统资源
+docker system df
+docker system info | grep "Total Memory"
 ```
 
-### 方式2: 手动部署
+## ⚡ 一键 Docker 部署
+
+### 方式1: 使用预构建镜像（推荐）
 
 ```bash
-# 1. 安装 Ollama
-curl -fsSL https://ollama.com/install.sh | sh
+# 1. 下载配置文件
+curl -O https://raw.githubusercontent.com/youweichen0208/YC-Tech-Blog/master/src/ai-tools/code/docker-compose.yml
 
-# 2. 启动 Ollama
-ollama serve &
+# 2. 一键启动 AI 工具链
+docker compose up -d
 
-# 3. 下载模型
-ollama pull llama3.1:8b
-ollama pull qwen2.5:7b
-
-# 4. 安装 Python 依赖
-pip install fastapi uvicorn httpx pydantic psutil
-
-# 5. 下载代理服务
-curl -O https://raw.githubusercontent.com/youweichen0208/YC-Tech-Blog/master/src/ai-tools/code/local_llm_proxy.py
-
-# 6. 启动代理服务
-python local_llm_proxy.py
+# 3. 查看启动状态
+docker compose ps
 ```
 
-## 🧪 快速测试
+### 方式2: 从源码构建
 
-部署完成后，可以进行以下测试：
-
-### 1. 健康检查
 ```bash
+# 1. 克隆项目
+git clone https://github.com/youweichen0208/YC-Tech-Blog.git
+cd YC-Tech-Blog/src/ai-tools/code
+
+# 2. 构建并启动
+docker compose up -d --build
+
+# 3. 等待模型下载完成
+docker compose logs -f ollama
+```
+
+## 📊 部署验证
+
+### 1. 服务健康检查
+```bash
+# 检查所有容器状态
+docker compose ps
+
+# 验证 API 服务
 curl http://localhost:8000/health
-```
 
-期望输出：
-```json
+# 期望输出
 {
   "status": "healthy",
-  "timestamp": "2024-10-28T10:30:00",
+  "claude_tools_ready": true,
   "ollama_connected": true,
-  "total_requests": 0
+  "models_loaded": ["llama3.1:8b", "qwen2.5:7b"]
 }
 ```
 
-### 2. 文本生成测试
+### 2. Claude Tools 集成测试
 ```bash
-curl -X POST http://localhost:8000/api/generate \
+# 测试代码审查工具
+curl -X POST http://localhost:8000/claude-tools/code-review \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "你好，请介绍一下你自己",
-    "model": "qwen2.5:7b",
-    "temperature": 0.7,
-    "max_tokens": 100
+    "code": "def hello():\n    print(\"Hello World\")",
+    "language": "python"
+  }'
+
+# 测试翻译工具
+curl -X POST http://localhost:8000/claude-tools/translate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hello, how are you?",
+    "target_lang": "chinese"
   }'
 ```
 
-### 3. 代码审查测试
+### 3. 模型直接调用测试
 ```bash
+# 测试智能路由
 curl -X POST http://localhost:8000/api/generate \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "请审查以下Python代码：\ndef hello():\n    print(\"Hello World\")",
-    "model": "deepseek-coder:6.7b",
-    "temperature": 0.3
+    "prompt": "写一个Python快速排序算法",
+    "task_type": "code",
+    "temperature": 0.2
   }'
 ```
 
-## 🔧 基础使用
+## 🤖 Claude Tools 集成使用
 
-### Python集成示例
+### 在 Claude Code 中使用本地大模型
 
-```python
-import httpx
-import asyncio
+```typescript
+// Claude Tools 配置
+const localLLMTool = {
+  name: "local_llm",
+  description: "调用本地Docker部署的大模型",
+  endpoint: "http://localhost:8000",
+  timeout: 30000
+};
 
-async def call_local_llm(prompt, model="llama3.1:8b"):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "http://localhost:8000/api/generate",
-            json={
-                "prompt": prompt,
-                "model": model,
-                "temperature": 0.7,
-                "max_tokens": 500
-            }
-        )
-        return response.json()
+// 代码审查示例
+const reviewResult = await callLocalLLM({
+  tool: "code_review",
+  code: `
+    def fibonacci(n):
+        if n <= 1:
+            return n
+        return fibonacci(n-1) + fibonacci(n-2)
+  `,
+  language: "python",
+  focus: ["performance", "security"]
+});
 
-# 使用示例
-async def main():
-    result = await call_local_llm("写一个Python的快速排序算法")
-    print(result["response"])
+// 翻译助手示例
+const translation = await callLocalLLM({
+  tool: "translate",
+  text: "Machine Learning is transforming the world",
+  target: "chinese"
+});
 
-asyncio.run(main())
+// 技术文档生成
+const documentation = await callLocalLLM({
+  tool: "document",
+  code: functionCode,
+  style: "detailed",
+  format: "markdown"
+});
 ```
 
-### curl命令示例
+### Docker 容器管理
 
 ```bash
-# 中文对话
-curl -X POST http://localhost:8000/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "解释什么是机器学习", "model": "qwen2.5:7b"}'
+# 查看容器状态
+docker compose ps
 
-# 代码生成
-curl -X POST http://localhost:8000/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "写一个JavaScript的冒泡排序", "model": "deepseek-coder:6.7b"}'
+# 查看日志
+docker compose logs local-llm-proxy
+docker compose logs ollama
 
-# 文本翻译
-curl -X POST http://localhost:8000/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "翻译成英文：今天天气很好", "model": "qwen2.5:7b"}'
+# 重启服务
+docker compose restart local-llm-proxy
+
+# 更新模型
+docker compose exec ollama ollama pull qwen2.5:14b
+
+# 扩容服务（如需要）
+docker compose up -d --scale local-llm-proxy=3
 ```
 
-## 📊 监控面板
+## 📊 监控与管理
 
-访问以下地址查看系统状态：
+### 访问监控面板
+- **API 文档**: http://localhost:8000/docs
+- **Prometheus 监控**: http://localhost:9090
+- **Grafana 仪表板**: http://localhost:3000 (admin/admin)
+- **容器状态**: `docker compose ps`
 
-- **API文档**: http://localhost:8000/docs
-- **系统状态**: http://localhost:8000/api/status
-- **模型列表**: http://localhost:8000/api/models
-
-## 🎛️ 常用管理命令
-
+### 性能调优配置
 ```bash
-# 查看运行状态
-./setup-local-llm.sh monitor
+# 优化内存使用
+export OLLAMA_NUM_PARALLEL=2
+export OLLAMA_MAX_LOADED_MODELS=2
 
-# 启动服务
-./setup-local-llm.sh start
+# 优化并发处理
+export PROXY_WORKERS=4
+export PROXY_MAX_REQUESTS=100
 
-# 停止服务
-./setup-local-llm.sh stop
-
-# 运行测试
-./setup-local-llm.sh test
-
-# 清理系统
-./setup-local-llm.sh clean
+# 重新启动以应用配置
+docker compose down && docker compose up -d
 ```
 
 ## 🔄 切换模型
