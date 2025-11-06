@@ -131,21 +131,17 @@ export default sidebar({
       ],
     },
     {
-      text: "💻 实现代码",
+      text: "💻 核心代码",
       icon: "code",
       children: [
-        "code/local_llm_proxy",
-        "code/claude_tools_integration",
-        "code/setup-local-llm",
+        "CODE_OVERVIEW",
       ],
     },
     {
-      text: "🚀 部署配置",
+      text: "🚀 部署指南",
       icon: "rocket",
       children: [
-        "code/docker-compose",
-        "code/requirements",
-        "code/Dockerfile",
+        "DOCKER_DEPLOYMENT",
       ],
     },
   ],
