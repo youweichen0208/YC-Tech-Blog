@@ -22,6 +22,12 @@ export default sidebar({
       children: "structure",
     },
     {
+      text: "🤖 AI 工具",
+      icon: "robot",
+      prefix: "ai-tools/",
+      children: "structure",
+    },
+    {
       text: "Projects",
       icon: "folder-open",
       prefix: "projects/",
@@ -111,6 +117,35 @@ export default sidebar({
         "deployment/DEPLOYMENT_GUIDE",
         "DEPLOYMENT",
         "MONITORING",
+      ],
+    },
+  ],
+  "/ai-tools/": [
+    "",
+    {
+      text: "🏗️ 本地大模型系统",
+      icon: "microchip",
+      children: [
+        "LOCAL_LLM_ARCHITECTURE",
+        "QUICKSTART",
+      ],
+    },
+    {
+      text: "💻 实现代码",
+      icon: "code",
+      children: [
+        "code/local_llm_proxy",
+        "code/claude_tools_integration",
+        "code/setup-local-llm",
+      ],
+    },
+    {
+      text: "🚀 部署配置",
+      icon: "rocket",
+      children: [
+        "code/docker-compose",
+        "code/requirements",
+        "code/Dockerfile",
       ],
     },
   ],
