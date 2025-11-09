@@ -8,104 +8,110 @@
 
 ## 🏗️ 系统架构图
 
-### 完整架构流程图
+### 架构组件总览
 
-```mermaid
-graph TB
-    subgraph "🤖 Claude Tools 生态"
-        A["Claude Code CLI<br/>🖥️ 用户界面"] --> B["工具调用层<br/>🔧 API Bridge"]
-        B --> C["本地LLM工具<br/>🎯 智能路由"]
-    end
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 20px 0;">
 
-    subgraph "🐳 Docker 容器集群"
-        C --> D["代理服务容器<br/>📡 local-llm-proxy:8000"]
-        D --> E["Ollama 容器<br/>🧠 ollama:11434"]
+<div style="background: #e1f5fe; border: 2px solid #01579b; border-radius: 8px; padding: 15px;">
+<h4 style="margin-top: 0; color: #01579b;">🤖 Claude Tools 生态</h4>
+<div style="margin: 10px 0;">📱 Claude Code CLI<br/><small>用户交互界面</small></div>
+<div style="margin: 10px 0;">🔧 工具调用层<br/><small>API Bridge</small></div>
+<div style="margin: 10px 0;">🎯 本地LLM工具<br/><small>智能路由</small></div>
+</div>
 
-        subgraph "🤖 模型容器组"
-            E --> F["Llama 3.1 8B<br/>💬 通用AI助手"]
-            E --> G["Qwen 2.5 7B<br/>🇨🇳 中文专家"]
-            E --> H["DeepSeek Coder 6.7B<br/>💻 代码专家"]
-        end
+<div style="background: #e8f5e8; border: 2px solid #2e7d32; border-radius: 8px; padding: 15px;">
+<h4 style="margin-top: 0; color: #2e7d32;">🐳 Docker 容器集群</h4>
+<div style="margin: 10px 0;">📡 代理服务容器<br/><small>local-llm-proxy:8000</small></div>
+<div style="margin: 10px 0;">🧠 Ollama 容器<br/><small>ollama:11434</small></div>
+<div style="margin: 10px 0;">⚡ Redis 缓存<br/><small>:6379</small></div>
+<div style="margin: 10px 0;">📊 Prometheus 监控<br/><small>:9090</small></div>
+<div style="margin: 10px 0;">📈 Grafana 可视化<br/><small>:3000</small></div>
+</div>
 
-        subgraph "🛠️ 基础设施容器"
-            I["Redis 缓存<br/>⚡ :6379"]
-            J["Prometheus 监控<br/>📊 :9090"]
-            K["Grafana 可视化<br/>📈 :3000"]
-        end
-    end
+<div style="background: #fff3e0; border: 2px solid #f57c00; border-radius: 8px; padding: 15px;">
+<h4 style="margin-top: 0; color: #f57c00;">🤖 AI 模型</h4>
+<div style="margin: 10px 0;">💬 Llama 3.1 8B<br/><small>通用AI助手</small></div>
+<div style="margin: 10px 0;">🇨🇳 Qwen 2.5 7B<br/><small>中文专家</small></div>
+<div style="margin: 10px 0;">💻 DeepSeek Coder 6.7B<br/><small>代码专家</small></div>
+<div style="margin: 10px 0;">☁️ Claude API<br/><small>复杂推理</small></div>
+</div>
 
-    subgraph "🎯 智能路由策略"
-        L{"任务类型识别<br/>🔍 Smart Router"}
-        L -->|"代码相关<br/>🔨 Code Tasks"| H
-        L -->|"中文处理<br/>🈳 Chinese Tasks"| G
-        L -->|"通用任务<br/>💡 General Tasks"| F
-        L -->|"复杂推理<br/>🧠 Complex Tasks"| M["Claude API<br/>☁️ Cloud Power"]
-    end
+</div>
 
-    C --> L
-    D -.-> I
-    D -.-> J
-    J --> K
+### 智能路由策略流程图
 
-    %% 样式定义
-    classDef claudeStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
-    classDef containerStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
-    classDef modelStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
-    classDef infraStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
-    classDef routerStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
-
-    %% 应用样式
-    class A,B,C claudeStyle
-    class D,E containerStyle
-    class F,G,H,M modelStyle
-    class I,J,K infraStyle
-    class L routerStyle
-```
-
-### 架构概述（文本版本）
-
-如果上述图表无法显示，以下是架构的文字描述：
+<div style="text-align: center; margin: 30px 0;">
 
 ```
-📱 用户界面层
-└── Claude Code CLI (用户交互入口)
-    └── 工具调用层 (API Bridge)
-        └── 本地LLM工具 (智能路由)
-
-🐳 Docker 容器集群
-├── 📡 代理服务容器 (local-llm-proxy:8000)
-│   ├── 连接 → 🧠 Ollama 容器 (ollama:11434)
-│   ├── 连接 → ⚡ Redis 缓存 (:6379)
-│   └── 连接 → 📊 Prometheus 监控 (:9090)
-│       └── 连接 → 📈 Grafana 可视化 (:3000)
-│
-├── 🤖 AI 模型容器组
-│   ├── 💬 Llama 3.1 8B (通用AI助手)
-│   ├── 🇨🇳 Qwen 2.5 7B (中文专家)
-│   └── 💻 DeepSeek Coder 6.7B (代码专家)
-│
-└── 🎯 智能路由策略
-    ├── 🔨 代码相关任务 → DeepSeek Coder
-    ├── 🈳 中文处理任务 → Qwen 2.5
-    ├── 💡 通用任务 → Llama 3.1
-    └── 🧠 复杂推理 → Claude API
+👤 用户请求
+     ↓
+📱 Claude Code CLI
+     ↓
+🔧 工具调用层
+     ↓
+🎯 本地LLM工具 (智能路由)
+     ↓
+🔍 任务类型识别
+     ↓
+┌─────────┬─────────┬─────────┬─────────┐
+│🔨 代码  │🈳 中文  │💡 通用  │🧠 复杂  │
+│   任务   │   处理   │   任务   │   推理   │
+│   ↓     │   ↓     │   ↓     │   ↓     │
+│DeepSeek │ Qwen2.5 │Llama3.1 │Claude   │
+│Coder    │   7B    │   8B    │  API    │
+└─────────┴─────────┴─────────┴─────────┘
+     ↓         ↓         ↓         ↓
+          📤 统一结果返回
+               ↓
+          👤 用户获得结果
 ```
 
-### 数据流向图
+</div>
 
-```
-用户请求 → Claude Code CLI → 工具调用层 → 本地LLM工具
-    ↓
-任务类型识别 (Smart Router)
-    ↓
-根据任务类型路由到相应模型：
-├── 代码任务 → DeepSeek Coder 6.7B
-├── 中文任务 → Qwen 2.5 7B
-├── 通用任务 → Llama 3.1 8B
-└── 复杂任务 → Claude API
-    ↓
-模型处理 → 结果返回 → 用户界面
-```
+### Docker 容器连接关系
+
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+<thead>
+<tr style="background: #f5f5f5;">
+<th style="border: 1px solid #ddd; padding: 12px;">容器服务</th>
+<th style="border: 1px solid #ddd; padding: 12px;">端口</th>
+<th style="border: 1px solid #ddd; padding: 12px;">功能描述</th>
+<th style="border: 1px solid #ddd; padding: 12px;">连接关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border: 1px solid #ddd; padding: 12px;">📡 claude-local-llm-proxy</td>
+<td style="border: 1px solid #ddd; padding: 12px;">8000</td>
+<td style="border: 1px solid #ddd; padding: 12px;">API代理服务，Claude Tools集成</td>
+<td style="border: 1px solid #ddd; padding: 12px;">→ ollama, redis, prometheus</td>
+</tr>
+<tr>
+<td style="border: 1px solid #ddd; padding: 12px;">🧠 claude-ollama</td>
+<td style="border: 1px solid #ddd; padding: 12px;">11434</td>
+<td style="border: 1px solid #ddd; padding: 12px;">AI模型运行时</td>
+<td style="border: 1px solid #ddd; padding: 12px;">接收 proxy 请求</td>
+</tr>
+<tr>
+<td style="border: 1px solid #ddd; padding: 12px;">⚡ claude-redis</td>
+<td style="border: 1px solid #ddd; padding: 12px;">6379</td>
+<td style="border: 1px solid #ddd; padding: 12px;">缓存和会话管理</td>
+<td style="border: 1px solid #ddd; padding: 12px;">接收 proxy 请求</td>
+</tr>
+<tr>
+<td style="border: 1px solid #ddd; padding: 12px;">📊 claude-prometheus</td>
+<td style="border: 1px solid #ddd; padding: 12px;">9090</td>
+<td style="border: 1px solid #ddd; padding: 12px;">监控数据收集</td>
+<td style="border: 1px solid #ddd; padding: 12px;">→ grafana</td>
+</tr>
+<tr>
+<td style="border: 1px solid #ddd; padding: 12px;">📈 claude-grafana</td>
+<td style="border: 1px solid #ddd; padding: 12px;">3000</td>
+<td style="border: 1px solid #ddd; padding: 12px;">可视化仪表板</td>
+<td style="border: 1px solid #ddd; padding: 12px;">读取 prometheus 数据</td>
+</tr>
+</tbody>
+</table>
 
 ## 🎯 核心优势
 

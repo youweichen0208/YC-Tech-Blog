@@ -131,6 +131,13 @@ export default sidebar({
       ],
     },
     {
+      text: "🔗 集成方案",
+      icon: "link",
+      children: [
+        "LITELLM_INTEGRATION",
+      ],
+    },
+    {
       text: "💻 核心代码",
       icon: "code",
       children: [
