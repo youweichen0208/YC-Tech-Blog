@@ -233,19 +233,113 @@ ollama pull llama3.2:3b   # CPU 友好
 | 本地 Mac | 本地 Mac | `http://localhost:8000/v1` |
 | 云服务器 | 云服务器 | `http://云服务器IP:8000/v1` |
 
-#### 安装方式
+#### 部署方式选择：Docker vs 原生部署
+
+##### 📊 对比分析
+
+| 指标 | Docker 容器化 | 原生部署（pip安装） | 推荐场景 |
+|-----|-------------|-------------------|---------|
+| **稳定性** | ⭐⭐⭐⭐⭐ 自动重启 | ⭐⭐⭐ 需手动管理 | Docker胜出 |
+| **运维成本** | ⭐⭐⭐⭐⭐ 一键管理 | ⭐⭐ 复杂配置 | Docker胜出 |
+| **推理性能** | 95-98% (2-5%开销) | 100% | 原生略优 |
+| **资源隔离** | ⭐⭐⭐⭐⭐ 完全隔离 | ⭐ 环境污染 | Docker胜出 |
+| **版本管理** | ⭐⭐⭐⭐⭐ 秒级回滚 | ⭐⭐ 手动切换 | Docker胜出 |
+| **迁移便捷性** | ⭐⭐⭐⭐⭐ 一键复制 | ⭐⭐ 重新配置 | Docker胜出 |
+| **学习成本** | ⭐⭐⭐ 需懂Docker | ⭐⭐⭐⭐⭐ 简单直接 | 原生易上手 |
+
+##### 🎯 推荐方案
+
+**场景1：长期稳定运行（生产环境）** → **强烈推荐 Docker** 🐳
+- ✅ 自动重启和故障恢复
+- ✅ 统一日志管理
+- ✅ 健康检查和监控
+- ✅ 2-5%性能损失完全值得（换来99.9%稳定性）
+
+**场景2：临时测试/学习** → 原生安装即可
+- ✅ 安装简单快速
+- ✅ 无需学习Docker
+- ⚠️ 不适合长期运行
+
+##### 云服务器操作流程 💡
+
+如果选择在**云服务器**上部署（推荐用于生产环境），操作流程：
+
+**步骤1：使用SSH工具连接云服务器**
 
 ```bash
-# 方式1：使用 pip 安装（轻量级）
-pip install litellm[proxy]
+# 方式1：使用 macOS/Linux 终端
+ssh root@你的云服务器IP
+# 或
+ssh -i ~/.ssh/your-key.pem ubuntu@你的云服务器IP
 
-# 方式2：使用 Docker（推荐生产环境）
-docker pull ghcr.io/berriai/litellm:main-latest
+# 方式2：Windows 用户使用 XShell/PuTTY/MobaXterm
+# - 打开 XShell → 新建会话
+# - 输入云服务器IP和端口(默认22)
+# - 输入用户名和密码（或使用SSH密钥）
+# - 点击连接
 ```
 
-**选择建议：**
-- **本地开发测试** → 使用 pip 安装
-- **生产环境/云服务器** → 使用 Docker 安装
+**步骤2：在云服务器上安装Docker**
+
+连接成功后，在SSH终端执行：
+
+```bash
+# 安装 Docker
+curl -fsSL https://get.docker.com | sh
+
+# 添加当前用户到docker组（避免每次sudo）
+sudo usermod -aG docker $USER
+newgrp docker  # 刷新组权限
+
+# 验证安装
+docker --version
+```
+
+**步骤3：安装NVIDIA Container Toolkit（vGPU支持）**
+
+```bash
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | \
+  sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+sudo systemctl restart docker
+
+# 验证GPU可用
+docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
+```
+
+##### 安装方式
+
+根据你的场景选择：
+
+**方案A：Docker部署（推荐生产环境）**
+
+```bash
+# 1. 拉取镜像
+docker pull ollama/ollama:latest
+docker pull ghcr.io/berriai/litellm:main-latest
+
+# 2. 创建docker-compose.yml（见后续章节）
+# 3. 一键启动
+docker-compose up -d
+```
+
+**方案B：原生安装（适合临时测试）**
+
+```bash
+# 1. 安装Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 2. 安装LiteLLM
+pip install litellm[proxy]
+
+# 3. 启动服务
+ollama serve &
+litellm --config litellm_config.yaml --port 8000
+```
 
 ### 2. 部署本地模型推理服务
 
@@ -491,84 +585,223 @@ litellm_settings:
     supported_call_types: ["completion", "acompletion", "embedding"]
 ```
 
-## 🐳 Docker Compose 部署
+## 🐳 生产级 Docker Compose 部署
 
-创建 `docker-compose.yml`：
+### 完整的 docker-compose.yml 配置
 
 ```yaml
 version: '3.8'
 
 services:
-  # LiteLLM 代理
+  # Ollama 模型推理服务
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # LiteLLM 代理服务
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
     container_name: litellm-proxy
+    restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
-      - ./litellm_config.yaml:/app/config.yaml
+      - ./litellm_config.yaml:/app/config.yaml:ro
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     command: --config /app/config.yaml --port 8000 --num_workers 4
-    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 20s
 
-  # Redis 缓存（可选）
+  # Redis 缓存（可选，提升性能）
   redis:
     image: redis:7-alpine
     container_name: litellm-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    command: redis-server --appendonly yes
-    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # Prometheus 监控（可选）
   prometheus:
     image: prom/prometheus:latest
     container_name: litellm-prometheus
+    restart: unless-stopped
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-    restart: unless-stopped
+      - '--storage.tsdb.retention.time=30d'
 
   # Grafana 可视化（可选）
   grafana:
     image: grafana/grafana:latest
     container_name: litellm-grafana
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana-data:/var/lib/grafana
-    restart: unless-stopped
 
 volumes:
+  ollama-data:
   redis-data:
   prometheus-data:
   grafana-data:
 ```
 
-启动服务：
+### 使用说明
+
+#### 1. 启动服务
 
 ```bash
 # 启动所有服务
 docker-compose up -d
 
-# 查看日志
+# 查看服务状态
+docker-compose ps
+
+# 查看实时日志
+docker-compose logs -f
+
+# 查看特定服务日志
 docker-compose logs -f litellm
+docker-compose logs -f ollama
+```
+
+#### 2. 下载模型
+
+```bash
+# 在Ollama容器内下载模型
+docker exec -it ollama ollama pull qwen2.5:7b
+docker exec -it ollama ollama pull deepseek-coder:6.7b
+docker exec -it ollama ollama pull llama3.1:8b
+
+# 查看已下载的模型
+docker exec -it ollama ollama list
+```
+
+#### 3. 验证服务
+
+```bash
+# 测试Ollama
+curl http://localhost:11434/api/tags
+
+# 测试LiteLLM
+curl http://localhost:8000/health
+
+# 测试模型列表
+curl http://localhost:8000/v1/models -H "Authorization: Bearer sk-1234"
+```
+
+#### 4. 日常运维
+
+```bash
+# 重启服务
+docker-compose restart litellm
+
+# 停止所有服务
+docker-compose down
+
+# 停止并删除数据卷
+docker-compose down -v
+
+# 更新到最新版本
+docker-compose pull
+docker-compose up -d
+
+# 查看资源占用
+docker stats
+```
+
+### Docker Compose 优势
+
+✅ **自动重启** - 服务崩溃自动恢复
+✅ **健康检查** - 自动检测服务状态
+✅ **依赖管理** - LiteLLM等待Ollama启动完成
+✅ **统一日志** - 集中查看所有服务日志
+✅ **一键部署** - 单条命令启动完整环境
+✅ **资源限制** - 防止单个服务占用过多资源
+✅ **持久化存储** - 数据不会因容器重启丢失
+
+### 旧版 Docker Compose（精简版）
+
+如果不需要监控，可以使用精简版：
+
+```yaml
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm-proxy
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml:ro
+    command: --config /app/config.yaml --port 8000 --num_workers 4
+    depends_on:
+      - ollama
+
+volumes:
+  ollama-data:
+```
 
 # 停止服务
 docker-compose down
