@@ -40,6 +40,170 @@ order: 3
 └──────────┘  └──────────┘  └──────────┘  └──────────┘
 ```
 
+## 💻 算力平台选择
+
+在部署本地大模型之前，需要选择合适的算力平台。以下是主流算力平台对比：
+
+### 平台兼容性对比
+
+| 算力平台 | Ollama | vLLM | 推理性能 | 推荐场景 |
+|---------|--------|------|---------|---------|
+| 🎮 **英伟达 GPU** | ✅ 完美支持 | ✅ 完美支持 | ⭐⭐⭐⭐⭐ | 🏆 首选方案 |
+| 🇨🇳 **华为升腾 NPU** | ❌ 不支持 | ⚠️ 部分支持 | ⭐⭐⭐⭐ | 国产化需求 |
+| 🍎 **Apple Silicon (M1/M2/M3)** | ✅ 原生支持 | ❌ 不支持 | ⭐⭐⭐ | 个人开发 |
+| 🔴 **AMD GPU (ROCm)** | ⚠️ 需编译 | ⚠️ 需编译 | ⭐⭐⭐ | AMD 设备 |
+| ⚡ **Intel GPU (oneAPI)** | ❌ 实验性 | ❌ 实验性 | ⭐⭐ | Intel Arc |
+| 🖥️ **CPU (纯CPU)** | ✅ 支持 | ✅ 支持 | ⭐ | 测试环境 |
+
+### 1. 英伟达 GPU 部署 🎮 (推荐)
+
+**硬件要求：**
+- GPU 显存：≥ 16GB (推荐 24GB+)
+- 推荐型号：RTX 4090 / A100 / A6000 / V100
+
+**云服务器推荐：**
+- 阿里云 GPU 云服务器 (ecs.gn7i-c8g1.2xlarge)
+- 腾讯云 GPU 云服务器 (GN10Xp)
+- AWS EC2 (p3.2xlarge / g5.xlarge)
+- Google Cloud Compute Engine (n1-standard-8 + T4)
+
+**部署步骤：**
+
+```bash
+# 1. 验证 NVIDIA 驱动
+nvidia-smi
+
+# 2. 安装 CUDA Toolkit (如未安装)
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
+sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
+sudo apt-get update
+sudo apt-get install cuda-12-2
+
+# 3. 安装 Ollama (自动使用 CUDA)
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 4. 下载模型
+ollama pull qwen2.5:7b       # 需要 ~5GB 显存
+ollama pull deepseek-coder:6.7b  # 需要 ~4GB 显存
+ollama pull llama3.1:8b      # 需要 ~5GB 显存
+
+# 5. 验证 GPU 加速
+ollama run qwen2.5:7b "测试GPU加速"
+# 使用 nvidia-smi 观察 GPU 使用率
+watch -n 1 nvidia-smi
+```
+
+**性能基准（英伟达 RTX 4090）：**
+- Qwen2.5 7B: ~80-100 tokens/s
+- DeepSeek-Coder 6.7B: ~90-110 tokens/s
+- Llama 3.1 8B: ~75-95 tokens/s
+
+### 2. 华为升腾 NPU 部署 🇨🇳
+
+**硬件要求：**
+- 升腾 310P / 910B
+- 驱动版本：CANN 7.0+
+
+**云服务器推荐：**
+- 华为云耀云服务器 L 实例 (ai1s.xlarge)
+- 华为云 ECS 通用计算增强型 (c7.xlarge.2)
+
+**部署步骤（vLLM）：**
+
+```bash
+# 1. 安装 CANN 驱动和固件
+# 参考华为官方文档：https://www.hiascend.com/document
+
+# 2. 验证 NPU 状态
+npu-smi info
+
+# 3. 安装支持升腾的 vLLM (需要特殊编译版本)
+pip install vllm-ascend  # 华为提供的适配版本
+
+# 4. 启动 vLLM 服务
+python -m vllm.entrypoints.openai.api_server \
+  --model Qwen/Qwen2.5-7B-Instruct \
+  --device ascend \
+  --tensor-parallel-size 1 \
+  --port 8001
+
+# 5. 配置 LiteLLM 连接 vLLM
+# 见后续配置章节
+```
+
+**⚠️ 注意事项：**
+- Ollama 目前不支持华为升腾
+- vLLM 需要使用华为官方适配版本
+- 部分模型可能需要转换格式（ONNX → OM）
+- 性能约为同级别英伟达 GPU 的 70-80%
+
+### 3. Apple Silicon 部署 🍎 (个人开发)
+
+**硬件要求：**
+- M1/M2/M3 系列芯片
+- 统一内存：≥ 16GB (推荐 32GB+)
+
+**部署步骤：**
+
+```bash
+# 1. 安装 Ollama (原生支持 Metal)
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 2. 下载模型
+ollama pull qwen2.5:7b
+ollama pull deepseek-coder:6.7b
+
+# 3. 验证 Metal 加速
+ollama run qwen2.5:7b "测试Metal加速"
+# 使用 Activity Monitor 观察 GPU 使用率
+```
+
+**性能基准（M2 Max 32GB）：**
+- Qwen2.5 7B: ~25-35 tokens/s
+- DeepSeek-Coder 6.7B: ~30-40 tokens/s
+
+### 4. AMD GPU 部署 🔴
+
+**硬件要求：**
+- AMD Radeon RX 7900 XTX / MI250X
+- ROCm 5.7+
+
+**部署步骤：**
+
+```bash
+# 1. 安装 ROCm
+sudo apt-get install rocm-hip-sdk
+
+# 2. 从源码编译 Ollama (ROCm 支持)
+git clone https://github.com/ollama/ollama.git
+cd ollama
+USE_ROCM=1 make
+
+# 3. 启动服务
+./ollama serve
+```
+
+### 5. 纯 CPU 部署 🖥️ (测试环境)
+
+**适用场景：**
+- 开发测试
+- 低频使用
+- 无 GPU 环境
+
+```bash
+# 安装 Ollama (自动使用 CPU)
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 下载较小的模型
+ollama pull qwen2.5:1.5b  # CPU 友好
+ollama pull llama3.2:3b   # CPU 友好
+```
+
+**性能基准（32核 CPU）：**
+- Qwen2.5 7B: ~5-8 tokens/s ⚠️ 较慢
+
 ## 🚀 快速开始
 
 ### 1. 安装 LiteLLM
@@ -52,7 +216,11 @@ pip install litellm[proxy]
 docker pull ghcr.io/berriai/litellm:main-latest
 ```
 
-### 2. 安装本地模型（以 Ollama 为例）
+### 2. 部署本地模型推理服务
+
+根据你的算力平台，选择对应的部署方式：
+
+#### 方案 A：Ollama (推荐用于英伟达 GPU / Mac M 系列)
 
 ```bash
 # 安装 Ollama
@@ -62,15 +230,35 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama pull qwen2.5:7b
 ollama pull deepseek-coder:6.7b
 ollama pull llama3.1:8b
+
+# 验证服务
+curl http://localhost:11434/api/tags
+```
+
+#### 方案 B：vLLM (推荐用于华为升腾 / 高性能场景)
+
+```bash
+# 安装 vLLM
+pip install vllm
+
+# 启动推理服务
+python -m vllm.entrypoints.openai.api_server \
+  --model Qwen/Qwen2.5-7B-Instruct \
+  --port 8001
+
+# 验证服务
+curl http://localhost:8001/v1/models
 ```
 
 ### 3. 配置 LiteLLM
 
-创建 `litellm_config.yaml`：
+创建 `litellm_config.yaml`，根据你的推理服务配置：
+
+#### 配置 A：对接 Ollama
 
 ```yaml
 model_list:
-  # Anthropic 格式的模型映射
+  # Anthropic 格式的模型映射到 Ollama
   - model_name: claude-3-5-sonnet-20241022
     litellm_params:
       model: ollama/qwen2.5:7b
@@ -86,7 +274,33 @@ model_list:
     litellm_params:
       model: anthropic/claude-3-5-sonnet-20241022
       api_key: ${ANTHROPIC_API_KEY}
+```
 
+#### 配置 B：对接 vLLM (华为升腾等)
+
+```yaml
+model_list:
+  # 映射到 vLLM 服务
+  - model_name: claude-3-5-sonnet-20241022
+    litellm_params:
+      model: openai/Qwen/Qwen2.5-7B-Instruct
+      api_base: http://localhost:8001/v1
+
+  - model_name: claude-3-opus-20240229
+    litellm_params:
+      model: openai/deepseek-ai/deepseek-coder-6.7b-instruct
+      api_base: http://localhost:8001/v1
+
+  # 回退到官方 API
+  - model_name: claude-3-5-sonnet-20241022-official
+    litellm_params:
+      model: anthropic/claude-3-5-sonnet-20241022
+      api_key: ${ANTHROPIC_API_KEY}
+```
+
+#### 通用配置（两种方案共用）
+
+```yaml
 # 通用配置
 litellm_settings:
   # 流式响应支持
