@@ -138,6 +138,13 @@ export default sidebar({
       ],
     },
     {
+      text: "📝 Claude CLI 使用",
+      icon: "file-code",
+      children: [
+        "CLAUDE_MD_GUIDE",
+      ],
+    },
+    {
       text: "💻 核心代码",
       icon: "code",
       children: [
