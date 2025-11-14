@@ -61,6 +61,7 @@ export default navbar([
       { text: "本地大模型架构", icon: "microchip", link: "LOCAL_LLM_ARCHITECTURE" },
       { text: "Docker快速部署", icon: "docker", link: "QUICKSTART" },
       { text: "MCP Server企业部署", icon: "server", link: "MCP_SERVER_ENTERPRISE_GUIDE" },
+      { text: "Claude Code设计哲学", icon: "lightbulb", link: "CLAUDE_CODE_DESIGN_PHILOSOPHY" },
       { text: "代码总览", icon: "code", link: "CODE_OVERVIEW" },
       { text: "部署指南", icon: "rocket", link: "DOCKER_DEPLOYMENT" },
     ],

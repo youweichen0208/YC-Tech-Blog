@@ -149,6 +149,7 @@ export default sidebar({
       icon: "file-code",
       children: [
         "CLAUDE_MD_GUIDE",
+        "CLAUDE_CODE_DESIGN_PHILOSOPHY",
       ],
     },
     {
