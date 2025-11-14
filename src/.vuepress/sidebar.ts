@@ -138,6 +138,13 @@ export default sidebar({
       ],
     },
     {
+      text: "🔧 MCP Server",
+      icon: "server",
+      children: [
+        "MCP_SERVER_ENTERPRISE_GUIDE",
+      ],
+    },
+    {
       text: "📝 Claude CLI 使用",
       icon: "file-code",
       children: [
